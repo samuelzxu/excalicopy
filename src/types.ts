@@ -104,6 +104,7 @@ export type AppState = {
   isLoading: boolean;
   errorMessage: React.ReactNode;
   isDrawingPointerUp: boolean | null;
+  activeDrawingElements: NonDeletedExcalidrawElement[];
   drawingPointerUpTimeoutID: number | null | unknown;
   draggingElement: NonDeletedExcalidrawElement | null;
   resizingElement: NonDeletedExcalidrawElement | null;

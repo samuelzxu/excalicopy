@@ -81,7 +81,7 @@ import {
   VERTICAL_ALIGN,
   ZOOM_STEP,
 } from "../constants";
-import { loadFromBlob } from "../data";
+import { loadFromBlob, getCanvasBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restore, restoreElements } from "../data/restore";
 import {
@@ -4853,16 +4853,30 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
-  private handleDrawingPointerUpTimeout(): void {
-    console.log("handleDrawingPointerUpTimeout");
-    if (typeof (this.state.drawingPointerUpTimeoutID) === "number") {
-      console.log("Clearing timeout");
+  private async handleDrawingPointerUpTimeout(): Promise<Blob> {
+    if (typeof this.state.drawingPointerUpTimeoutID === "number") {
+      console.log("clearing timeout");
       const id: number = this.state.drawingPointerUpTimeoutID;
       window.clearTimeout(id);
     }
+    console.log(this.state.activeDrawingElements);
     this.setState({
       drawingPointerUpTimeoutID: null,
+      activeDrawingElements: [],
     });
+    let blobPromise = getCanvasBlob(
+      this.state.activeDrawingElements, 
+      this.state, 
+      this.files,
+      {
+        exportBackground: true,
+        viewBackgroundColor: this.state.viewBackgroundColor,
+      });
+    blobPromise.then((blob) => {
+      let url = URL.createObjectURL(blob);
+      console.log(url);
+    });
+    return blobPromise;
   }
 
   // Returns whether the pointer move happened over either scrollbar
@@ -4920,28 +4934,7 @@ class App extends React.Component<AppProps, AppState> {
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
 
-      if (
-        this.state.draggingElement &&
-        this.state.draggingElement.type === "freedraw" &&
-        !this.state.drawingPointerUpTimeoutID
-      ) {
-        console.log("Drawing pointer up");
-        const timeoutPromise = new Promise((resolve) => {
-          resolve(
-            window.setTimeout(
-              () => this.handleDrawingPointerUpTimeout(),
-              2000,
-            ));
-          }
-        );
-        
-        timeoutPromise.then((res) => {
-          console.log("ID:" ,res);
-          this.setState({
-            drawingPointerUpTimeoutID: res,
-          });
-        });
-      }
+
       // Handle end of dragging a point of a linear element, might close a loop
       // and sets binding element
       if (this.state.editingLinearElement) {
@@ -5061,7 +5054,30 @@ class App extends React.Component<AppProps, AppState> {
         });
 
         this.actionManager.executeAction(actionFinalize);
-
+        
+        if (!this.state.drawingPointerUpTimeoutID) {
+          if (this.state.activeDrawingElements && this.state.activeDrawingElements.length >= 0) {
+            const activeElements: ExcalidrawElement[] = this.state.activeDrawingElements;
+            this.setState({
+                activeDrawingElements: [...activeElements, draggingElement]
+              });
+          }
+          console.log("Drawing pointer up");
+          const timeoutPromise = new Promise((resolve) => {
+            resolve(
+              window.setTimeout(() => this.handleDrawingPointerUpTimeout(),
+                2000,
+              ));
+            }
+          );
+          
+          timeoutPromise.then((res) => {
+            console.log("ID:" ,res);
+            this.setState({
+              drawingPointerUpTimeoutID: res,
+            });
+          });
+        }
         return;
       }
       if (isImageElement(draggingElement)) {

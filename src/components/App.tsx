@@ -4853,6 +4853,7 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
+  // When the pointer up timeout expires, blob the active drawing elements
   private async handleDrawingPointerUpTimeout(): Promise<Blob> {
     if (typeof this.state.drawingPointerUpTimeoutID === "number") {
       console.log("clearing timeout");

@@ -15,6 +15,8 @@ import { serializeAsJSON } from "./json";
 export { loadFromBlob } from "./blob";
 export { loadFromJSON, saveAsJSON } from "./json";
 
+export const BLOB_UPLOAD_URL = process.env.REACT_APP_BLOB_UPLOAD_URL!;
+
 export const getCanvasBlob = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,

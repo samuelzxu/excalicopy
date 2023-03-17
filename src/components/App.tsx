@@ -81,7 +81,8 @@ import {
   VERTICAL_ALIGN,
   ZOOM_STEP,
 } from "../constants";
-import { loadFromBlob, getCanvasBlob } from "../data";
+import { loadFromBlob, getCanvasBlob, BLOB_UPLOAD_URL} from "../data";
+
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restore, restoreElements } from "../data/restore";
 import {
@@ -4876,6 +4877,18 @@ class App extends React.Component<AppProps, AppState> {
     blobPromise.then((blob) => {
       let url = URL.createObjectURL(blob);
       console.log(url);
+      let formData = new FormData();
+
+      formData.append("file", blob);
+      console.log(BLOB_UPLOAD_URL)
+      fetch(BLOB_UPLOAD_URL, {
+        method: "POST",
+        body: formData,
+     })
+     .then((response) => response.text())
+     .then((responseText) => {
+        console.log(responseText);
+     });
     });
     return blobPromise;
   }

@@ -81,7 +81,7 @@ import {
   VERTICAL_ALIGN,
   ZOOM_STEP,
 } from "../constants";
-import { loadFromBlob, getCanvasBlob, BLOB_UPLOAD_URL} from "../data";
+import { loadFromBlob, getCanvasBlob, BLOB_UPLOAD_URL, GKE_LOADBALANCER_ORIGIN} from "../data";
 
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restore, restoreElements } from "../data/restore";
@@ -4862,10 +4862,8 @@ class App extends React.Component<AppProps, AppState> {
       window.clearTimeout(id);
     }
     console.log(this.state.activeDrawingElements);
-    this.setState({
-      drawingPointerUpTimeoutID: null,
-      activeDrawingElements: [],
-    });
+
+    // Create the blob for active drawing elements
     let blobPromise = getCanvasBlob(
       this.state.activeDrawingElements, 
       this.state, 
@@ -4874,6 +4872,13 @@ class App extends React.Component<AppProps, AppState> {
         exportBackground: true,
         viewBackgroundColor: this.state.viewBackgroundColor,
       });
+
+    // Reset drawing elements to null
+    this.setState({
+      drawingPointerUpTimeoutID: null,
+      activeDrawingElements: [],
+    });
+
     blobPromise.then((blob) => {
       let url = URL.createObjectURL(blob);
       console.log(url);
@@ -4886,10 +4891,20 @@ class App extends React.Component<AppProps, AppState> {
         body: formData,
      })
      .then((response) => response.text())
-     .then((responseText) => {
-        console.log(responseText);
-     });
-    });
+     .then((text) => {
+        console.log(text);
+        // console.log(GKE_LOADBALANCER_ORIGIN);
+        // const response = fetch(GKE_LOADBALANCER_ORIGIN+':8080/predictions/trocr-handwritten/1.0', {
+        //   method: "POST",
+        //   mode: "cors",
+        //   headers: {
+        //     'Content-Type': 'application/x-www-form-urlencoded',
+        //     'Access-Control-Allow-Origin': GKE_LOADBALANCER_ORIGIN,
+        //   },
+        //   body: "data=" + imageUrl,
+        // })
+    })
+  });
     return blobPromise;
   }
 

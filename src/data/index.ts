@@ -16,6 +16,7 @@ export { loadFromBlob } from "./blob";
 export { loadFromJSON, saveAsJSON } from "./json";
 
 export const BLOB_UPLOAD_URL = process.env.REACT_APP_BLOB_UPLOAD_URL!;
+export const GKE_LOADBALANCER_ORIGIN = process.env.REACT_APP_GKE_LOADBALANCER_ORIGIN!;
 
 export const getCanvasBlob = async (
   elements: readonly NonDeletedExcalidrawElement[],

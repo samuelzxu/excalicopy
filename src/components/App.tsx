@@ -4873,12 +4873,6 @@ class App extends React.Component<AppProps, AppState> {
         viewBackgroundColor: this.state.viewBackgroundColor,
       });
 
-    // Reset drawing elements to null
-    this.setState({
-      drawingPointerUpTimeoutID: null,
-      activeDrawingElements: [],
-    });
-
     blobPromise.then((blob) => {
       let url = URL.createObjectURL(blob);
       console.log(url);
@@ -4892,17 +4886,106 @@ class App extends React.Component<AppProps, AppState> {
      })
      .then((response) => response.text())
      .then((text) => {
-        console.log(text);
-        // console.log(GKE_LOADBALANCER_ORIGIN);
-        // const response = fetch(GKE_LOADBALANCER_ORIGIN+':8080/predictions/trocr-handwritten/1.0', {
-        //   method: "POST",
-        //   mode: "cors",
-        //   headers: {
-        //     'Content-Type': 'application/x-www-form-urlencoded',
-        //     'Access-Control-Allow-Origin': GKE_LOADBALANCER_ORIGIN,
-        //   },
-        //   body: "data=" + imageUrl,
-        // })
+        // Minimum of the x, y coordinates of active drawing elements
+        console.log(cursorX, cursorY);
+        let minX = 100000, minY = 1000000, maxX = -100000, maxY = -100000;
+        this.state.activeDrawingElements.forEach((element) => {
+          if (element.x < minX) {
+            minX = element.x;
+          }
+          if (element.x > maxX) {
+            maxX = element.x;
+          }
+          if (element.y < minY) {
+            minY = element.y;
+          }
+          if (element.y > maxY) {
+            maxY = element.y
+          }
+        });
+        let nonDrawingElems = this.scene.getNonDeletedElements().filter((element) => {
+          return !this.state.activeDrawingElements.includes(element);
+        });
+        this.scene.replaceAllElements(nonDrawingElems);
+        // pass x, y, and text to the next then
+        return Promise.resolve({text, x: minX, y: minY});
+      })
+      .then(({text, x, y}) => {
+
+      console.log("Max X and min Y: ",x,y);
+      const textElementProps = {
+        x,
+        y,
+        strokeColor: this.state.currentItemStrokeColor,
+        backgroundColor: this.state.currentItemBackgroundColor,
+        fillStyle: this.state.currentItemFillStyle,
+        strokeWidth: this.state.currentItemStrokeWidth,
+        strokeStyle: this.state.currentItemStrokeStyle,
+        roundness: null,
+        roughness: this.state.currentItemRoughness,
+        opacity: this.state.currentItemOpacity,
+        text,
+        fontSize: this.state.currentItemFontSize*2,
+        fontFamily: this.state.currentItemFontFamily,
+        textAlign: this.state.currentItemTextAlign,
+        verticalAlign: DEFAULT_VERTICAL_ALIGN,
+        locked: false,
+      };
+  
+      const LINE_GAP = 10;
+      let currentY = y;
+
+      const lines = [text];
+      const textElements = lines.reduce(
+        (acc: ExcalidrawTextElement[], line, idx) => {
+          const text = line.trim();
+
+          if (text.length) {
+            const element = newTextElement({
+              ...textElementProps,
+              x,
+              y: currentY,
+              text,
+            });
+            acc.push(element);
+            currentY += element.height + LINE_GAP;
+          } else {
+            const prevLine = lines[idx - 1]?.trim();
+            // add paragraph only if previous line was not empty, IOW don't add
+            // more than one empty line
+            if (prevLine) {
+              const defaultLineHeight = getApproxLineHeight(
+                getFontString({
+                  fontSize: textElementProps.fontSize,
+                  fontFamily: textElementProps.fontFamily,
+                }),
+              );
+
+              currentY += defaultLineHeight + LINE_GAP;
+            }
+          }
+
+          return acc;
+        },
+        [],
+      );
+
+      this.scene.replaceAllElements([
+        ...this.scene.getElementsIncludingDeleted(),
+        ...textElements,
+      ]);
+
+      this.setState({
+        selectedElementIds: Object.fromEntries(
+          textElements.map((el) => [el.id, true]),
+        ),
+      });
+
+    }).then(() => {
+      this.setState({
+        drawingPointerUpTimeoutID: null,
+        activeDrawingElements: [],
+      });
     })
   });
     return blobPromise;

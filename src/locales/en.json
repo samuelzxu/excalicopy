@@ -467,7 +467,7 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "This tool can read your handwriting! That is, unless you're a doctor... Pick the pen tool and write a sentence! Just make sure it's on a single line. This whiteboard was forked form Excalidraw at https://github.com/excalidraw",
+      "center_heading": "This tool can read your handwriting! That is, unless you're a doctor... Pick the pen tool and write a sentence! It's at the top of the page, and it looks like a little pencil :) Just make sure it's on a single line. This whiteboard was forked form Excalidraw at https://github.com/excalidraw",
       "center_heading_plus": "Did you want to go to the Excalidraw+ instead?",
       "menuHint": "Export, preferences, languages, ..."
     },

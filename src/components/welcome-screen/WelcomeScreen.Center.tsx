@@ -112,7 +112,7 @@ Center.displayName = "Center";
 const Logo = ({ children }: { children?: React.ReactNode }) => {
   return (
     <div className="welcome-screen-center__logo virgil welcome-screen-decor">
-      {children || <> Unscribble - Freehand reading Whiteboard</>}
+      {children || <> Unscribble : Freehand Reader</>}
     </div>
   );
 };

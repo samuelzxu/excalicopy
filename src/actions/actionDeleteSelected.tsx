@@ -89,7 +89,7 @@ export const actionDeleteSelected = register({
           return el;
         });
         const nextAppState = handleGroupEditingState(appState, nextElements);
-
+        
         return {
           elements: nextElements,
           appState: {

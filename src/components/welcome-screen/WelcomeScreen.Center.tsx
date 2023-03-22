@@ -112,7 +112,7 @@ Center.displayName = "Center";
 const Logo = ({ children }: { children?: React.ReactNode }) => {
   return (
     <div className="welcome-screen-center__logo virgil welcome-screen-decor">
-      {children || <>{ExcalLogo} Excalidraw</>}
+      {children || <> Freehand-reading Whiteboard</>}
     </div>
   );
 };
@@ -128,13 +128,13 @@ const Heading = ({ children }: { children: React.ReactNode }) => {
 Heading.displayName = "Heading";
 
 const Menu = ({ children }: { children?: React.ReactNode }) => {
+  return null;
   return <div className="welcome-screen-menu">{children}</div>;
 };
 Menu.displayName = "Menu";
 
 const MenuItemHelp = () => {
   const actionManager = useExcalidrawActionManager();
-
   return (
     <WelcomeScreenMenuItem
       onSelect={() => actionManager.executeAction(actionShortcuts)}

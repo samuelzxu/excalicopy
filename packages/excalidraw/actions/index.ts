@@ -13,11 +13,11 @@ export {
   actionChangeStrokeWidth,
   actionChangeFillStyle,
   actionChangeSloppiness,
-  actionChangeOpacity,
+  // actionChangeOpacity,
+  actionChangeVerticalAlign,
   actionChangeFontSize,
   actionChangeFontFamily,
   actionChangeTextAlign,
-  actionChangeVerticalAlign,
 } from "./actionProperties";
 
 export {

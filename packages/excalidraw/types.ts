@@ -279,6 +279,7 @@ export interface AppState {
   };
   editingFrame: string | null;
   elementsToHighlight: NonDeleted<ExcalidrawElement>[] | null;
+  mathMode: boolean;
   /**
    * set when a new text is created or when an existing text is being edited
    */

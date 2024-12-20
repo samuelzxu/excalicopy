@@ -1425,6 +1425,16 @@ export const FontSizeExtraLargeIcon = createIcon(
   modifiedTablerIconProps,
 );
 
+export const MathIcon = createIcon(
+  // Math icon
+  // The capital letter "M"
+  <g strokeWidth={1.5}>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M4 20v-16l4 14l4 -14v16" stroke="currentColor" fill="none" />
+  </g>,
+  tablerIconProps,
+);
+
 export const fontSizeIcon = createIcon(
   <g strokeWidth={1.25}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />

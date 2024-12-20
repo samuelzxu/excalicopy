@@ -4657,6 +4657,10 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
+  setMathMode = (mathMode: boolean) => {
+    this.setState({mathMode})
+  }
+
   setActiveTool = (
     tool: (
       | (

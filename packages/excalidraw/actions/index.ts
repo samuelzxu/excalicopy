@@ -14,10 +14,10 @@ export {
   actionChangeFillStyle,
   actionChangeSloppiness,
   actionChangeOpacity,
+  actionChangeVerticalAlign,
   actionChangeFontSize,
   actionChangeFontFamily,
   actionChangeTextAlign,
-  actionChangeVerticalAlign,
 } from "./actionProperties";
 
 export {

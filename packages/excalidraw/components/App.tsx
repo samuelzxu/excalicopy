@@ -4657,6 +4657,10 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
+  setMathMode = (mathMode: boolean) => {
+    this.setState({ mathMode });
+  };
+
   setActiveTool = (
     tool: (
       | (
@@ -7349,26 +7353,50 @@ class App extends React.Component<AppProps, AppState> {
       y: gridY,
     });
 
-    const simulatePressure = event.pressure === 0.5;
+    let element: NonDeleted<ExcalidrawFreeDrawElement>;
+    if (this.state.mathMode) {
+      const simulatePressure = false;
 
-    const element = newFreeDrawElement({
-      type: elementType,
-      x: gridX,
-      y: gridY,
-      strokeColor: this.state.currentItemStrokeColor,
-      backgroundColor: this.state.currentItemBackgroundColor,
-      fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
-      strokeStyle: this.state.currentItemStrokeStyle,
-      roughness: this.state.currentItemRoughness,
-      opacity: this.state.currentItemOpacity,
-      roundness: null,
-      simulatePressure,
-      locked: false,
-      frameId: topLayerFrame ? topLayerFrame.id : null,
-      points: [pointFrom<LocalPoint>(0, 0)],
-      pressures: simulatePressure ? [] : [event.pressure],
-    });
+      element = newFreeDrawElement({
+        type: elementType,
+        x: gridX,
+        y: gridY,
+        strokeColor: this.state.currentItemStrokeColor,
+        backgroundColor: this.state.currentItemBackgroundColor,
+        fillStyle: this.state.currentItemFillStyle,
+        strokeWidth: 0.5,
+        strokeStyle: this.state.currentItemStrokeStyle,
+        roughness: 0,
+        opacity: 100,
+        roundness: null,
+        simulatePressure,
+        locked: false,
+        frameId: topLayerFrame ? topLayerFrame.id : null,
+        points: [pointFrom<LocalPoint>(0, 0)],
+        pressures: simulatePressure ? [] : [event.pressure],
+      });
+    } else {
+      const simulatePressure = event.pressure === 0.5;
+
+      element = newFreeDrawElement({
+        type: elementType,
+        x: gridX,
+        y: gridY,
+        strokeColor: this.state.currentItemStrokeColor,
+        backgroundColor: this.state.currentItemBackgroundColor,
+        fillStyle: this.state.currentItemFillStyle,
+        strokeWidth: this.state.currentItemStrokeWidth,
+        strokeStyle: this.state.currentItemStrokeStyle,
+        roughness: this.state.currentItemRoughness,
+        opacity: this.state.currentItemOpacity,
+        roundness: null,
+        simulatePressure,
+        locked: false,
+        frameId: topLayerFrame ? topLayerFrame.id : null,
+        points: [pointFrom<LocalPoint>(0, 0)],
+        pressures: simulatePressure ? [] : [event.pressure],
+      });
+    }
 
     this.scene.insertElement(element);
 

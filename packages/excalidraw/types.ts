@@ -279,6 +279,7 @@ export interface AppState {
   };
   editingFrame: string | null;
   elementsToHighlight: NonDeleted<ExcalidrawElement>[] | null;
+  mathMode: boolean;
   /**
    * set when a new text is created or when an existing text is being edited
    */
@@ -674,6 +675,7 @@ export type AppClassProperties = {
   onMagicframeToolSelect: App["onMagicframeToolSelect"];
   getName: App["getName"];
   dismissLinearEditor: App["dismissLinearEditor"];
+  setMathMode: App["setMathMode"];
   flowChartCreator: App["flowChartCreator"];
   getEffectiveGridSize: App["getEffectiveGridSize"];
   setPlugins: App["setPlugins"];

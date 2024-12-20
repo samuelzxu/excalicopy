@@ -185,17 +185,19 @@ export const SelectedShapeActions = ({
         <>{renderAction("changeArrowhead")}</>
       )}
 
-      {renderAction("changeOpacity")}
+      {!appState.mathMode && renderAction("changeOpacity")}
 
-      <fieldset>
-        <legend>{t("labels.layers")}</legend>
-        <div className="buttonList">
-          {renderAction("sendToBack")}
-          {renderAction("sendBackward")}
-          {renderAction("bringForward")}
-          {renderAction("bringToFront")}
-        </div>
-      </fieldset>
+      {!appState.mathMode && appState.activeTool.type === "freedraw" && (
+        <fieldset>
+          <legend>{t("labels.layers")}</legend>
+          <div className="buttonList">
+            {renderAction("sendToBack")}
+            {renderAction("sendBackward")}
+            {renderAction("bringForward")}
+            {renderAction("bringToFront")}
+          </div>
+        </fieldset>
+      )}
 
       {targetElements.length > 1 && !isSingleElementBoundContainer && (
         <fieldset>
@@ -328,17 +330,16 @@ export const ShapesSwitcher = ({
       })}
       <div className="App-toolbar__divider" />
       <ToolButton
-      className={clsx("MathMode")}
-      key="mathMode"
-      type="radio"
-      icon={MathIcon}
-      checked={appState.mathMode}
-      aria-label="Math Mode"
-      onPointerDown={() => {
-        app.setMathMode(!appState.mathMode);
-      }}
+        className={clsx("MathMode")}
+        key="mathMode"
+        type="radio"
+        icon={MathIcon}
+        checked={appState.mathMode}
+        aria-label="Math Mode"
+        onPointerDown={() => {
+          app.setMathMode(!appState.mathMode);
+        }}
       />
-
 
       <DropdownMenu open={isExtraToolsMenuOpen}>
         <DropdownMenu.Trigger

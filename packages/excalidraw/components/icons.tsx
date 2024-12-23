@@ -1428,10 +1428,18 @@ export const FontSizeExtraLargeIcon = createIcon(
 export const MathIcon = createIcon(
   // Math icon
   // The capital letter "M"
-  <g strokeWidth={1.5}>
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M4 20v-16l4 14l4 -14v16" stroke="currentColor" fill="none" />
-  </g>,
+  <text
+    x="50%"
+    y="50%"
+    dominant-baseline="middle"
+    text-anchor="middle"
+    font-family="Arial"
+    font-size="25"
+    stroke-width="0.2"
+    fill="black"
+  >
+    M
+  </text>,
   tablerIconProps,
 );
 

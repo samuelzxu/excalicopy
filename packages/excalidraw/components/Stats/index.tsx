@@ -247,7 +247,6 @@ export const StatsInner = memo(
                       <StatsRow heading data-testid="stats-element-type">
                         {t(`element.${singleElement.type}`)}
                       </StatsRow>
-
                       <StatsRow>
                         <Position
                           element={singleElement}

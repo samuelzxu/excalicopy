@@ -342,6 +342,9 @@ export const ShapesSwitcher = ({
         checked={appState.mathMode}
         aria-label="Math Mode"
         onPointerDown={() => {
+          if (!appState.mathMode) {
+            app.setupMathMode();
+          }
           app.setMathMode(!appState.mathMode);
         }}
       />

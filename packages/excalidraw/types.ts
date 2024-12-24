@@ -676,6 +676,7 @@ export type AppClassProperties = {
   getName: App["getName"];
   dismissLinearEditor: App["dismissLinearEditor"];
   setMathMode: App["setMathMode"];
+  setupMathMode: App["setupMathMode"];
   flowChartCreator: App["flowChartCreator"];
   getEffectiveGridSize: App["getEffectiveGridSize"];
   setPlugins: App["setPlugins"];

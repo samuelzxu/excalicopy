@@ -1,23 +1,24 @@
-import type {
-  ExcalidrawElement,
-  ExcalidrawImageElement,
-  ExcalidrawTextElement,
-  ExcalidrawLinearElement,
-  ExcalidrawGenericElement,
-  NonDeleted,
-  TextAlign,
-  GroupId,
-  VerticalAlign,
-  Arrowhead,
-  ExcalidrawFreeDrawElement,
-  FontFamilyValues,
-  ExcalidrawTextContainer,
-  ExcalidrawFrameElement,
-  ExcalidrawEmbeddableElement,
-  ExcalidrawMagicFrameElement,
-  ExcalidrawIframeElement,
-  ElementsMap,
-  ExcalidrawArrowElement,
+import {
+  type ExcalidrawElement,
+  type ExcalidrawImageElement,
+  type ExcalidrawTextElement,
+  type ExcalidrawLinearElement,
+  type ExcalidrawGenericElement,
+  type NonDeleted,
+  type TextAlign,
+  type GroupId,
+  type VerticalAlign,
+  type Arrowhead,
+  type ExcalidrawFreeDrawElement,
+  type FontFamilyValues,
+  type ExcalidrawTextContainer,
+  type ExcalidrawFrameElement,
+  type ExcalidrawEmbeddableElement,
+  type ExcalidrawMagicFrameElement,
+  type ExcalidrawIframeElement,
+  type ElementsMap,
+  type ExcalidrawArrowElement,
+  ExcalidrawMathElement,
 } from "./types";
 import { arrayToMap, getUpdatedTimestamp, isTestEnv } from "../utils";
 import { randomInteger, randomId } from "../random";
@@ -32,6 +33,7 @@ import {
   wrapTextElement,
   getBoundTextMaxWidth,
 } from "./textElement";
+import { wrapText } from "./textWrapping";
 import {
   DEFAULT_ELEMENT_PROPS,
   DEFAULT_FONT_FAMILY,
@@ -459,6 +461,18 @@ export const newFreeDrawElement = (
   };
 };
 
+export const newMathElement = (
+  opts: {
+    type: "math";
+    text: string;
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawMathElement> => {
+  return {
+    ..._newElementBase<ExcalidrawMathElement>("math", opts),
+    text: opts.text,
+  };
+}
+
 export const newLinearElement = (
   opts: {
     type: ExcalidrawLinearElement["type"];
@@ -507,6 +521,7 @@ export const newImageElement = (
     status?: ExcalidrawImageElement["status"];
     fileId?: ExcalidrawImageElement["fileId"];
     scale?: ExcalidrawImageElement["scale"];
+    crop?: ExcalidrawImageElement["crop"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawImageElement> => {
   const map = getSubtypeMethods(opts?.subtype);
@@ -519,6 +534,7 @@ export const newImageElement = (
     status: opts.status ?? "pending",
     fileId: opts.fileId ?? null,
     scale: opts.scale ?? [1, 1],
+    crop: opts.crop ?? null,
   };
 };
 

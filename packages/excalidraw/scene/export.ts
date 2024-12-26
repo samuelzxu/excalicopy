@@ -34,12 +34,11 @@ import {
 import { newTextElement } from "../element";
 import { type Mutable } from "../utility-types";
 import { newElementWith } from "../element/mutateElement";
-import { isFrameLikeElement, isTextElement } from "../element/typeChecks";
+import { isFrameLikeElement } from "../element/typeChecks";
 import type { RenderableElementsMap } from "./types";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { renderStaticScene } from "../renderer/staticScene";
 import { Fonts } from "../fonts";
-import type { Font } from "../fonts/ExcalidrawFont";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -175,7 +174,7 @@ export const exportToCanvas = async (
     return { canvas, scale: appState.exportScale };
   },
   loadFonts: () => Promise<void> = async () => {
-    await Fonts.loadFontsForElements(elements);
+    await Fonts.loadElementsFonts(elements);
   },
 ) => {
   // load font faces before continuing, by default leverages browsers' [FontFace API](https://developer.mozilla.org/en-US/docs/Web/API/FontFace)
@@ -274,6 +273,7 @@ export const exportToSvg = async (
     renderEmbeddables?: boolean;
     exportingFrame?: ExcalidrawFrameLikeElement | null;
     skipInliningFonts?: true;
+    reuseImages?: boolean;
   },
 ): Promise<SVGSVGElement> => {
   const frameRendering = getFrameRenderingConfig(
@@ -308,9 +308,7 @@ export const exportToSvg = async (
   // the tempScene hack which duplicates and regenerates ids
   if (exportEmbedScene) {
     try {
-      metadata = await (
-        await import("../data/image")
-      ).encodeSvgMetadata({
+      metadata = (await import("../data/image")).encodeSvgMetadata({
         // when embedding scene, we want to embed the origionally supplied
         // elements which don't contain the temp frame labels.
         // But it also requires that the exportToSvg is being supplied with
@@ -366,14 +364,17 @@ export const exportToSvg = async (
         </clipPath>`;
   }
 
-  const fontFaces = opts?.skipInliningFonts ? [] : await getFontFaces(elements);
+  const fontFaces = !opts?.skipInliningFonts
+    ? await Fonts.generateFontFaceDeclarations(elements)
+    : [];
+
+  const delimiter = "\n      "; // 6 spaces
 
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
   ${metadata}
   <defs>
-    <style class="style-fonts">
-      ${fontFaces.join("\n")}
+    <style class="style-fonts">${delimiter}${fontFaces.join(delimiter)}
     </style>
     ${exportingFrameClipPath}
   </defs>
@@ -415,6 +416,7 @@ export const exportToSvg = async (
               .map((element) => [element.id, true]),
           )
         : new Map(),
+      reuseImages: opts?.reuseImages ?? true,
     },
   );
 
@@ -443,68 +445,4 @@ export const getExportSize = (
   );
 
   return [width, height];
-};
-
-const getFontFaces = async (
-  elements: readonly ExcalidrawElement[],
-): Promise<string[]> => {
-  const fontFamilies = new Set<number>();
-  const codePoints = new Set<number>();
-
-  for (const element of elements) {
-    if (!isTextElement(element)) {
-      continue;
-    }
-
-    fontFamilies.add(element.fontFamily);
-
-    // gather unique codepoints only when inlining fonts
-    for (const codePoint of Array.from(element.originalText, (u) =>
-      u.codePointAt(0),
-    )) {
-      if (codePoint) {
-        codePoints.add(codePoint);
-      }
-    }
-  }
-
-  const getSource = (font: Font) => {
-    try {
-      // retrieve font source as dataurl based on the used codepoints
-      return font.getContent(codePoints);
-    } catch {
-      // fallback to font source as a url
-      return font.urls[0].toString();
-    }
-  };
-
-  const fontFaces = await Promise.all(
-    Array.from(fontFamilies).map(async (x) => {
-      const { fonts, metadata } = Fonts.registered.get(x) ?? {};
-
-      if (!Array.isArray(fonts)) {
-        console.error(
-          `Couldn't find registered fonts for font-family "${x}"`,
-          Fonts.registered,
-        );
-        return [];
-      }
-
-      if (metadata?.local) {
-        // don't inline local fonts
-        return [];
-      }
-
-      return Promise.all(
-        fonts.map(
-          async (font) => `@font-face {
-        font-family: ${font.fontFace.family};
-        src: url(${await getSource(font)});
-          }`,
-        ),
-      );
-    }),
-  );
-
-  return fontFaces.flat();
 };

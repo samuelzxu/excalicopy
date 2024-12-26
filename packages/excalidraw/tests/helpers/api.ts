@@ -39,6 +39,7 @@ import {
   newIframeElement,
   newImageElement,
   newMagicFrameElement,
+  newMathElement,
 } from "../../element/newElement";
 import type { AppState } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
@@ -376,6 +377,13 @@ export class API {
         break;
       case "magicframe":
         element = newMagicFrameElement({ ...base, width, height });
+        break;
+      case "math":
+        element = newMathElement({
+          type: "math",
+          text: "x^2",
+          ...base,
+        });
         break;
       default:
         assertNever(

@@ -229,6 +229,7 @@ export const isExcalidrawElement = (
     case "frame":
     case "magicframe":
     case "image":
+    case "math":
     case "selection": {
       return true;
     }

@@ -11,7 +11,7 @@ import {
   isBoundToContainer,
   isTextElement,
 } from "./typeChecks";
-import { CLASSES, isSafari, POINTER_BUTTON } from "../constants";
+import { CLASSES, POINTER_BUTTON } from "../constants";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -28,13 +28,13 @@ import {
   measureText,
   normalizeText,
   redrawTextBoundingBox,
-  wrapText,
   getBoundTextMaxHeight,
   getBoundTextMaxWidth,
   computeContainerDimensionForBoundText,
   computeBoundTextPosition,
   getBoundTextElement,
 } from "./textElement";
+import { wrapText } from "./textWrapping";
 import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
@@ -294,11 +294,6 @@ export const textWysiwyg = ({
 
       const font = getFontString(updatedTextElement);
 
-      // adding left and right padding buffer, so that browser does not cut the glyphs (does not work in Safari)
-      const padding = !isSafari
-        ? Math.ceil(updatedTextElement.fontSize / appState.zoom.value / 2)
-        : 0;
-
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
@@ -308,7 +303,7 @@ export const textWysiwyg = ({
         lineHeight: updatedTextElement.lineHeight,
         width: `${width}px`,
         height: `${height}px`,
-        left: `${viewportX - padding}px`,
+        left: `${viewportX}px`,
         top: `${viewportY}px`,
         ...transformOrigin,
         transform: getTransform(
@@ -320,7 +315,6 @@ export const textWysiwyg = ({
           maxWidth,
           editorMaxHeight,
         ),
-        padding: `0 ${padding}px`,
         textAlign,
         verticalAlign,
         color: updatedTextElement.strokeColor,
@@ -361,6 +355,7 @@ export const textWysiwyg = ({
     minHeight: "1em",
     backfaceVisibility: "hidden",
     margin: 0,
+    padding: 0,
     border: 0,
     outline: 0,
     resize: "none",

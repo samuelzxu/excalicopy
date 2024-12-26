@@ -1,24 +1,23 @@
-import {
-  type ExcalidrawElement,
-  type ExcalidrawImageElement,
-  type ExcalidrawTextElement,
-  type ExcalidrawLinearElement,
-  type ExcalidrawGenericElement,
-  type NonDeleted,
-  type TextAlign,
-  type GroupId,
-  type VerticalAlign,
-  type Arrowhead,
-  type ExcalidrawFreeDrawElement,
-  type FontFamilyValues,
-  type ExcalidrawTextContainer,
-  type ExcalidrawFrameElement,
-  type ExcalidrawEmbeddableElement,
-  type ExcalidrawMagicFrameElement,
-  type ExcalidrawIframeElement,
-  type ElementsMap,
-  type ExcalidrawArrowElement,
-  ExcalidrawMathElement,
+import type {
+  ExcalidrawElement,
+  ExcalidrawImageElement,
+  ExcalidrawTextElement,
+  ExcalidrawLinearElement,
+  ExcalidrawGenericElement,
+  NonDeleted,
+  TextAlign,
+  GroupId,
+  VerticalAlign,
+  Arrowhead,
+  ExcalidrawFreeDrawElement,
+  FontFamilyValues,
+  ExcalidrawTextContainer,
+  ExcalidrawFrameElement,
+  ExcalidrawEmbeddableElement,
+  ExcalidrawMagicFrameElement,
+  ExcalidrawIframeElement,
+  ElementsMap,
+  ExcalidrawArrowElement,
 } from "./types";
 import {
   arrayToMap,
@@ -433,18 +432,6 @@ export const newFreeDrawElement = (
     lastCommittedPoint: null,
   };
 };
-
-export const newMathElement = (
-  opts: {
-    type: "math";
-    text: string;
-  } & ElementConstructorOpts,
-): NonDeleted<ExcalidrawMathElement> => {
-  return {
-    ..._newElementBase<ExcalidrawMathElement>("math", opts),
-    text: opts.text,
-  };
-}
 
 export const newLinearElement = (
   opts: {

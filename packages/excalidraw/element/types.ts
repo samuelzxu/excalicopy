@@ -100,11 +100,6 @@ export type ExcalidrawEmbeddableElement = _ExcalidrawElementBase &
     type: "embeddable";
   }>;
 
-export type ExcalidrawMathElement = {
-  type: "math";
-  text: string; // The math/markdown content
-} & _ExcalidrawElementBase;
-
 export type MagicGenerationData =
   | {
       status: "pending";
@@ -215,8 +210,7 @@ export type ExcalidrawElement =
   | ExcalidrawFrameElement
   | ExcalidrawMagicFrameElement
   | ExcalidrawIframeElement
-  | ExcalidrawEmbeddableElement
-  | ExcalidrawMathElement;
+  | ExcalidrawEmbeddableElement;
 
 export type ExcalidrawNonSelectionElement = Exclude<
   ExcalidrawElement,

@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { flushSync } from "react-dom";
-import { ExcalidrawMathElement } from "../element/types";
+
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
@@ -144,7 +144,6 @@ import {
   newEmbeddableElement,
   newMagicFrameElement,
   newIframeElement,
-  newMathElement,
   newArrowElement,
 } from "../element/newElement";
 import {
@@ -350,7 +349,6 @@ import {
   hideHyperlinkToolip,
   Hyperlink,
 } from "../components/hyperlink/Hyperlink";
-import { MathElement } from "./MathElement";
 import { isLocalLink, normalizeLink, toValidURL } from "../data/url";
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { actionUnlockAllElements } from "../actions/actionElementLock";
@@ -4662,8 +4660,6 @@ class App extends React.Component<AppProps, AppState> {
   setMathMode = (mathMode: boolean) => {
     this.setState({ mathMode });
   };
-
-  setupMathMode = () => {};
 
   setActiveTool = (
     tool: (

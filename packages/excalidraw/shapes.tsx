@@ -156,11 +156,6 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
     case "text":
     case "selection":
       return getPolygonShape(element);
-    case "math":
-      return getPolygonShape({
-        ...element,
-        type: "rectangle",
-      });
     case "arrow":
     case "line": {
       const roughShape =

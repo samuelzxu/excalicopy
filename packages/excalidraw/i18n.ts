@@ -123,7 +123,7 @@ const findPartsForData = (data: any, parts: string[]) => {
 };
 
 export const t = (
-  path: NestedKeyOf<typeof fallbackLangData> | string,
+  path: NestedKeyOf<typeof fallbackLangData>,
   replacement?: { [key: string]: string | number } | null,
   fallback?: string,
 ) => {

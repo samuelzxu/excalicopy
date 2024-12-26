@@ -342,14 +342,6 @@ export const _generateElementShape = (
       }
       return shape;
     }
-    case "math":
-      return generator.rectangle(
-        0,
-        0,
-        element.width,
-        element.height,
-        generateRoughOptions(element),
-      )
     case "diamond": {
       let shape: ElementShapes[typeof element.type];
 

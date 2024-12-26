@@ -35,28 +35,29 @@ const ChartPreviewBtn = (props: {
     let svg: SVGSVGElement;
     const previewNode = previewRef.current!;
     (async () => {
-<!--     (async () => { // Things from mathjax PR
+      (async () => {
+        // Things from mathjax PR
         let elements: ChartElements;
         await ensureSubtypesLoaded(
           props.spreadsheet?.activeSubtypes ?? [],
-          () => {
+          async () => {
             if (!props.spreadsheet) {
               return;
-            } -->
-      svg = await exportToSvg(
-        elements,
-        {
-          exportBackground: false,
-          viewBackgroundColor: oc.white,
-        },
-        null, // files
-        {
-          skipInliningFonts: true,
-        },
-      );
-      svg.querySelector(".style-fonts")?.remove();
-      previewNode.replaceChildren();
-      previewNode.appendChild(svg);
+            }
+            svg = await exportToSvg(
+              elements,
+              {
+                exportBackground: false,
+                viewBackgroundColor: oc.white,
+              },
+              null, // files
+              {
+                skipInliningFonts: true,
+              },
+            );
+            svg.querySelector(".style-fonts")?.remove();
+            previewNode.replaceChildren();
+            previewNode.appendChild(svg);
 
             elements = renderSpreadsheet(
               props.chartType,

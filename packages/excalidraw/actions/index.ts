@@ -14,10 +14,10 @@ export {
   actionChangeFillStyle,
   actionChangeSloppiness,
   actionChangeOpacity,
+  actionChangeVerticalAlign,
   actionChangeFontSize,
   actionChangeFontFamily,
   actionChangeTextAlign,
-  actionChangeVerticalAlign,
 } from "./actionProperties";
 
 export {
@@ -88,3 +88,5 @@ export { actionToggleElementLock } from "./actionElementLock";
 export { actionToggleLinearEditor } from "./actionLinearEditor";
 
 export { actionToggleSearchMenu } from "./actionToggleSearchMenu";
+
+export { actionToggleCropEditor } from "./actionCropEditor";

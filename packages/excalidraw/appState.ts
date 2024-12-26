@@ -55,6 +55,7 @@ export const getDefaultAppState = (): Omit<
     },
     penMode: false,
     penDetected: false,
+    mathMode: false,
     errorMessage: null,
     exportBackground: true,
     exportScale: defaultExportScale,
@@ -84,6 +85,7 @@ export const getDefaultAppState = (): Omit<
     scrollX: 0,
     scrollY: 0,
     selectedElementIds: {},
+    hoveredElementIds: {},
     selectedGroupIds: {},
     selectedElementsAreBeingDragged: false,
     selectionElement: null,
@@ -116,6 +118,8 @@ export const getDefaultAppState = (): Omit<
     objectsSnapModeEnabled: false,
     userToFollow: null,
     followedBy: new Set(),
+    isCropping: false,
+    croppingElementId: null,
     searchMatches: [],
   };
 };
@@ -210,6 +214,7 @@ const APP_STATE_STORAGE_CONF = (<
   scrollX: { browser: true, export: false, server: false },
   scrollY: { browser: true, export: false, server: false },
   selectedElementIds: { browser: true, export: false, server: false },
+  hoveredElementIds: { browser: false, export: false, server: false },
   selectedGroupIds: { browser: true, export: false, server: false },
   selectedElementsAreBeingDragged: {
     browser: false,
@@ -217,6 +222,7 @@ const APP_STATE_STORAGE_CONF = (<
     server: false,
   },
   selectionElement: { browser: false, export: false, server: false },
+  mathMode: { browser: false, export: false, server: false },
   shouldCacheIgnoreZoom: { browser: true, export: false, server: false },
   stats: { browser: true, export: false, server: false },
   startBoundElement: { browser: false, export: false, server: false },
@@ -239,6 +245,8 @@ const APP_STATE_STORAGE_CONF = (<
   objectsSnapModeEnabled: { browser: true, export: false, server: false },
   userToFollow: { browser: false, export: false, server: false },
   followedBy: { browser: false, export: false, server: false },
+  isCropping: { browser: false, export: false, server: false },
+  croppingElementId: { browser: false, export: false, server: false },
   searchMatches: { browser: false, export: false, server: false },
 });
 

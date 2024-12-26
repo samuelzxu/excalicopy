@@ -29,9 +29,13 @@ import { getResizedElementAbsoluteCoords } from "./bounds";
 import {
   measureTextElement,
   normalizeText,
+<<<<<<< HEAD
   wrapTextElement,
+=======
+>>>>>>> 5618136c3d8f21c391bd119d550acbdb1e71e6f3
   getBoundTextMaxWidth,
 } from "./textElement";
+import { wrapText } from "./textWrapping";
 import {
   DEFAULT_ELEMENT_PROPS,
   DEFAULT_FONT_FAMILY,
@@ -507,6 +511,7 @@ export const newImageElement = (
     status?: ExcalidrawImageElement["status"];
     fileId?: ExcalidrawImageElement["fileId"];
     scale?: ExcalidrawImageElement["scale"];
+    crop?: ExcalidrawImageElement["crop"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawImageElement> => {
   const map = getSubtypeMethods(opts?.subtype);
@@ -519,6 +524,7 @@ export const newImageElement = (
     status: opts.status ?? "pending",
     fileId: opts.fileId ?? null,
     scale: opts.scale ?? [1, 1],
+    crop: opts.crop ?? null,
   };
 };
 

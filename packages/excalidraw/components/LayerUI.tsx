@@ -273,29 +273,6 @@ const LayerUI = ({
                             device={device}
                             app={app}
                           />
-<<<<<<< HEAD
-                        </Stack.Row>
-                      </Island>
-                      <SubtypeToggles />
-                      {isCollaborating && (
-                        <Island
-                          style={{
-                            marginLeft: 8,
-                            alignSelf: "center",
-                            height: "fit-content",
-                          }}
-                        >
-                          <LaserPointerButton
-                            title={t("toolBar.laser")}
-                            checked={
-                              appState.activeTool.type === TOOL_TYPE.laser
-                            }
-                            onChange={() =>
-                              app.setActiveTool({ type: TOOL_TYPE.laser })
-                            }
-                            isMobile
-                          />
-=======
                           {heading}
                           <Stack.Row gap={1}>
                             <PenModeButton
@@ -327,7 +304,6 @@ const LayerUI = ({
                               app={app}
                             />
                           </Stack.Row>
->>>>>>> 5618136c3d8f21c391bd119d550acbdb1e71e6f3
                         </Island>
                         {isCollaborating && (
                           <Island

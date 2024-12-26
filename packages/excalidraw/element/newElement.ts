@@ -29,11 +29,8 @@ import { getResizedElementAbsoluteCoords } from "./bounds";
 import {
   measureTextElement,
   normalizeText,
-<<<<<<< HEAD
-  wrapTextElement,
-=======
->>>>>>> 5618136c3d8f21c391bd119d550acbdb1e71e6f3
   getBoundTextMaxWidth,
+  wrapTextElement,
 } from "./textElement";
 import { wrapText } from "./textWrapping";
 import {

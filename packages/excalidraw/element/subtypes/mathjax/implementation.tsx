@@ -8,8 +8,8 @@ import {
   getContainerElement,
   getTextWidth,
   measureText,
-  wrapText,
 } from "../../../element/textElement";
+import { wrapText } from "../../../element/textWrapping";
 import {
   hasBoundTextElement,
   isTextElement,

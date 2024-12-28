@@ -51,6 +51,37 @@ import { ShapeCache } from "./scene/ShapeCache";
 import type { NormalizedZoomValue, Zoom } from "./types";
 import { invariant } from "./utils";
 
+export const MATHTOOLS = [
+  {
+    icon: SelectionIcon,
+    value: "selection",
+    key: KEYS.V,
+    numericKey: KEYS["1"],
+    fillable: true,
+  },
+  {
+    icon: FreedrawIcon,
+    value: "freedraw",
+    key: [KEYS.P, KEYS.X],
+    numericKey: KEYS["7"],
+    fillable: false,
+  },
+  {
+    icon: TextIcon,
+    value: "text",
+    key: KEYS.T,
+    numericKey: KEYS["8"],
+    fillable: false,
+  },
+  {
+    icon: EraserIcon,
+    value: "eraser",
+    key: KEYS.E,
+    numericKey: KEYS["0"],
+    fillable: false,
+  },
+] as const;
+
 export const SHAPES = [
   {
     icon: SelectionIcon,

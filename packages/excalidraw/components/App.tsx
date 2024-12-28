@@ -7117,7 +7117,7 @@ class App extends React.Component<AppProps, AppState> {
         strokeColor: this.state.currentItemStrokeColor,
         backgroundColor: this.state.currentItemBackgroundColor,
         fillStyle: this.state.currentItemFillStyle,
-        strokeWidth: 0.5,
+        strokeWidth: 0.2,
         strokeStyle: this.state.currentItemStrokeStyle,
         roughness: 0,
         opacity: 100,

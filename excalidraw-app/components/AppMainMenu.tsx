@@ -1,14 +1,14 @@
 import React from "react";
-import {
-  loginIcon,
-  ExcalLogo,
-  eyeIcon,
-} from "../../packages/excalidraw/components/icons";
+// import {
+//   loginIcon,
+//   ExcalLogo,
+//   eyeIcon,
+// } from "../../packages/excalidraw/components/icons";
 import type { Theme } from "../../packages/excalidraw/element/types";
 import { MainMenu } from "../../packages/excalidraw/index";
-import { isExcalidrawPlusSignedUser } from "../app_constants";
+// import { isExcalidrawPlusSignedUser } from "../app_constants";
 import { LanguageList } from "../app-language/LanguageList";
-import { saveDebugState } from "./DebugCanvas";
+// import { saveDebugState } from "./DebugCanvas";
 
 export const AppMainMenu: React.FC<{
   onCollabDialogOpen: () => any;
@@ -24,17 +24,17 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.SaveToActiveFile />
       <MainMenu.DefaultItems.Export />
       <MainMenu.DefaultItems.SaveAsImage />
-      {props.isCollabEnabled && (
+      {/* {props.isCollabEnabled && (
         <MainMenu.DefaultItems.LiveCollaborationTrigger
           isCollaborating={props.isCollaborating}
           onSelect={() => props.onCollabDialogOpen()}
         />
-      )}
+      )} */}
       <MainMenu.DefaultItems.CommandPalette className="highlighted" />
       <MainMenu.DefaultItems.SearchMenu />
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
-      <MainMenu.Separator />
+      {/* <MainMenu.Separator />
       <MainMenu.ItemLink
         icon={ExcalLogo}
         href={`${
@@ -70,7 +70,7 @@ export const AppMainMenu: React.FC<{
         >
           Visual Debug
         </MainMenu.Item>
-      )}
+      )} */}
       <MainMenu.Separator />
       <MainMenu.DefaultItems.ToggleTheme
         allowSystemTheme

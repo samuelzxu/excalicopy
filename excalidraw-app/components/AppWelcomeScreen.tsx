@@ -1,5 +1,5 @@
 import React from "react";
-import { loginIcon } from "../../packages/excalidraw/components/icons";
+// import { loginIcon } from "../../packages/excalidraw/components/icons";
 import { useI18n } from "../../packages/excalidraw/i18n";
 import { WelcomeScreen } from "../../packages/excalidraw/index";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
@@ -50,7 +50,7 @@ export const AppWelcomeScreen: React.FC<{
         <WelcomeScreen.Center.Menu>
           <WelcomeScreen.Center.MenuItemLoadScene />
           <WelcomeScreen.Center.MenuItemHelp />
-          {props.isCollabEnabled && (
+          {/* {props.isCollabEnabled && (
             <WelcomeScreen.Center.MenuItemLiveCollaborationTrigger
               onSelect={() => props.onCollabDialogOpen()}
             />
@@ -65,7 +65,7 @@ export const AppWelcomeScreen: React.FC<{
             >
               Sign up
             </WelcomeScreen.Center.MenuItemLink>
-          )}
+          )} */}
         </WelcomeScreen.Center.Menu>
       </WelcomeScreen.Center>
     </WelcomeScreen>

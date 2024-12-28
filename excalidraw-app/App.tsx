@@ -22,7 +22,7 @@ import { useCallbackRefState } from "../packages/excalidraw/hooks/useCallbackRef
 import { t } from "../packages/excalidraw/i18n";
 import {
   Excalidraw,
-  LiveCollaborationTrigger,
+  // LiveCollaborationTrigger,
   TTDDialogTrigger,
   StoreAction,
   reconcileElements,
@@ -102,7 +102,7 @@ import { openConfirmModal } from "../packages/excalidraw/components/OverwriteCon
 import { OverwriteConfirmDialog } from "../packages/excalidraw/components/OverwriteConfirm/OverwriteConfirm";
 import Trans from "../packages/excalidraw/components/Trans";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
-import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
+// import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
 import type { RemoteExcalidrawElement } from "../packages/excalidraw/data/reconcile";
 import {
   CommandPalette,
@@ -363,7 +363,7 @@ const ExcalidrawWrapper = () => {
   const [isCollaborating] = useAtomWithInitialValue(isCollaboratingAtom, () => {
     return isCollaborationLink(window.location.href);
   });
-  const collabError = useAtomValue(collabErrorIndicatorAtom);
+  // const collabError = useAtomValue(collabErrorIndicatorAtom);
 
   useHandleLibrary({
     excalidrawAPI,
@@ -834,22 +834,22 @@ const ExcalidrawWrapper = () => {
         handleKeyboardGlobally={true}
         autoFocus={true}
         theme={editorTheme}
-        renderTopRightUI={(isMobile) => {
-          if (isMobile || !collabAPI || isCollabDisabled) {
-            return null;
-          }
-          return (
-            <div className="top-right-ui">
-              {collabError.message && <CollabError collabError={collabError} />}
-              <LiveCollaborationTrigger
-                isCollaborating={isCollaborating}
-                onSelect={() =>
-                  setShareDialogState({ isOpen: true, type: "share" })
-                }
-              />
-            </div>
-          );
-        }}
+        // renderTopRightUI={(isMobile) => {
+        //   if (isMobile || !collabAPI || isCollabDisabled) {
+        //     return null;
+        //   }
+        //   return (
+        //     <div className="top-right-ui">
+        //       {collabError.message && <CollabError collabError={collabError} />}
+        //       <LiveCollaborationTrigger
+        //         isCollaborating={isCollaborating}
+        //         onSelect={() =>
+        //           setShareDialogState({ isOpen: true, type: "share" })
+        //         }
+        //       />
+        //     </div>
+        //   );
+        // }}
       >
         <AppMainMenu
           onCollabDialogOpen={onCollabDialogOpen}

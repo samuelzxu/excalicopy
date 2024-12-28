@@ -3,6 +3,9 @@ import {
   exportToSvg as _exportToSvg,
 } from "../excalidraw/scene/export";
 import { getDefaultAppState } from "../excalidraw/appState";
+import { canvasToBlob } from "../excalidraw/data/blob";
+import { DEFAULT_EXPORT_PADDING } from "../excalidraw/constants";
+import { type NonDeletedExcalidrawElement } from "../excalidraw/element/types";
 import type { AppState, BinaryFiles } from "../excalidraw/types";
 import type {
   ExcalidrawElement,
@@ -93,6 +96,33 @@ export const exportToCanvas = ({
       };
     },
   );
+};
+
+export const getCanvasBlob = async (
+  elements: readonly NonDeletedExcalidrawElement[],
+  appState: AppState,
+  files: BinaryFiles,
+  {
+    exportBackground,
+    viewBackgroundColor,
+    exportPadding = DEFAULT_EXPORT_PADDING,
+  }: {
+    exportBackground: boolean;
+    viewBackgroundColor: string;
+    exportPadding?: number;
+  },
+) => {
+  const tempCanvas = await exportToCanvas({
+    elements,
+    appState,
+    files,
+    exportPadding,
+  });
+  tempCanvas.style.display = "none";
+  document.body.appendChild(tempCanvas);
+  const blob = await canvasToBlob(tempCanvas);
+  tempCanvas.remove();
+  return blob;
 };
 
 export const exportToBlob = async (

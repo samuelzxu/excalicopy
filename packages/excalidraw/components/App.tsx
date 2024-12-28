@@ -444,8 +444,7 @@ import {
 import { textWysiwyg } from "../element/textWysiwyg";
 import { isOverScrollBars } from "../scene/scrollbars";
 import { syncInvalidIndices, syncMovedIndices } from "../fractionalIndex";
-import { exportToCanvas } from "../../utils";
-import { canvasToBlob } from "../data/blob";
+import { getCanvasBlob } from "../../utils";
 import {
   isPointHittingLink,
   isPointHittingLinkIcon,
@@ -555,33 +554,6 @@ const gesture: Gesture = {
   lastCenter: null,
   initialDistance: null,
   initialScale: null,
-};
-
-export const getCanvasBlob = async (
-  elements: readonly NonDeletedExcalidrawElement[],
-  appState: AppState,
-  files: BinaryFiles,
-  {
-    exportBackground,
-    viewBackgroundColor,
-    exportPadding = DEFAULT_EXPORT_PADDING,
-  }: {
-    exportBackground: boolean;
-    viewBackgroundColor: string;
-    exportPadding?: number;
-  },
-) => {
-  const tempCanvas = await exportToCanvas({
-    elements,
-    appState,
-    files,
-    exportPadding,
-  });
-  tempCanvas.style.display = "none";
-  document.body.appendChild(tempCanvas);
-  const blob = await canvasToBlob(tempCanvas);
-  tempCanvas.remove();
-  return blob;
 };
 
 class App extends React.Component<AppProps, AppState> {
@@ -4546,7 +4518,7 @@ class App extends React.Component<AppProps, AppState> {
       drawingPointerUpTimeoutID: null,
       activeDrawingElements: [],
     });
-    let blobPromise = getCanvasBlob(
+    const blobPromise = getCanvasBlob(
       this.state.activeDrawingElements,
       this.state,
       this.files,
@@ -4556,7 +4528,7 @@ class App extends React.Component<AppProps, AppState> {
       },
     );
     blobPromise.then((blob) => {
-      let url = URL.createObjectURL(blob);
+      const url = URL.createObjectURL(blob);
       console.log(url);
     });
     return blobPromise;
@@ -8499,11 +8471,13 @@ class App extends React.Component<AppProps, AppState> {
 
         this.actionManager.executeAction(actionFinalize);
 
-        if (!this.state.drawingPointerUpTimeoutID) {
+        if (this.state.mathMode && !this.state.drawingPointerUpTimeoutID) {
           if (
             this.state.activeDrawingElements &&
             this.state.activeDrawingElements.length >= 0
           ) {
+            // If there are active elements not sent yet, append the new element to the
+            //  active elements as the new state
             const activeElements: ExcalidrawElement[] =
               this.state.activeDrawingElements;
             this.setState({

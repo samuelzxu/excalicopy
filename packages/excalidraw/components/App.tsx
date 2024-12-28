@@ -48,7 +48,11 @@ import {
 } from "../appState";
 import type { PastedMixedContent } from "../clipboard";
 import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
-import { ARROW_TYPE, type EXPORT_IMAGE_TYPES } from "../constants";
+import {
+  ARROW_TYPE,
+  DEFAULT_EXPORT_PADDING,
+  type EXPORT_IMAGE_TYPES,
+} from "../constants";
 import {
   APP_NAME,
   CURSOR_TYPE,
@@ -440,6 +444,8 @@ import {
 import { textWysiwyg } from "../element/textWysiwyg";
 import { isOverScrollBars } from "../scene/scrollbars";
 import { syncInvalidIndices, syncMovedIndices } from "../fractionalIndex";
+import { exportToCanvas } from "../../utils";
+import { canvasToBlob } from "../data/blob";
 import {
   isPointHittingLink,
   isPointHittingLinkIcon,
@@ -549,6 +555,33 @@ const gesture: Gesture = {
   lastCenter: null,
   initialDistance: null,
   initialScale: null,
+};
+
+export const getCanvasBlob = async (
+  elements: readonly NonDeletedExcalidrawElement[],
+  appState: AppState,
+  files: BinaryFiles,
+  {
+    exportBackground,
+    viewBackgroundColor,
+    exportPadding = DEFAULT_EXPORT_PADDING,
+  }: {
+    exportBackground: boolean;
+    viewBackgroundColor: string;
+    exportPadding?: number;
+  },
+) => {
+  const tempCanvas = await exportToCanvas({
+    elements,
+    appState,
+    files,
+    exportPadding,
+  });
+  tempCanvas.style.display = "none";
+  document.body.appendChild(tempCanvas);
+  const blob = await canvasToBlob(tempCanvas);
+  tempCanvas.remove();
+  return blob;
 };
 
 class App extends React.Component<AppProps, AppState> {
@@ -4502,6 +4535,33 @@ class App extends React.Component<AppProps, AppState> {
     }
   });
 
+  private async handleDrawingPointerUpTimeout(): Promise<Blob> {
+    if (typeof this.state.drawingPointerUpTimeoutID === "number") {
+      console.log("clearing timeout");
+      const id: number = this.state.drawingPointerUpTimeoutID;
+      window.clearTimeout(id);
+    }
+    console.log(this.state.activeDrawingElements);
+    this.setState({
+      drawingPointerUpTimeoutID: null,
+      activeDrawingElements: [],
+    });
+    let blobPromise = getCanvasBlob(
+      this.state.activeDrawingElements,
+      this.state,
+      this.files,
+      {
+        exportBackground: true,
+        viewBackgroundColor: this.state.viewBackgroundColor,
+      },
+    );
+    blobPromise.then((blob) => {
+      let url = URL.createObjectURL(blob);
+      console.log(url);
+    });
+    return blobPromise;
+  }
+
   // We purposely widen the `tool` type so this helper can be called with
   // any tool without having to type check it
   private isToolSupported = <T extends ToolType | "custom">(tool: T) => {
@@ -7151,6 +7211,12 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
+    if (typeof this.state.drawingPointerUpTimeoutID == "number") {
+      console.log("clearing timeout");
+      window.clearTimeout(this.state.drawingPointerUpTimeoutID);
+      this.setState({ drawingPointerUpTimeoutID: null });
+    }
+
     this.scene.insertElement(element);
 
     this.setState((prevState) => {
@@ -8433,6 +8499,34 @@ class App extends React.Component<AppProps, AppState> {
 
         this.actionManager.executeAction(actionFinalize);
 
+        if (!this.state.drawingPointerUpTimeoutID) {
+          if (
+            this.state.activeDrawingElements &&
+            this.state.activeDrawingElements.length >= 0
+          ) {
+            const activeElements: ExcalidrawElement[] =
+              this.state.activeDrawingElements;
+            this.setState({
+              activeDrawingElements: [...activeElements, newElement],
+            });
+          }
+          console.log("Drawing pointer up");
+          const timeoutPromise = new Promise((resolve) => {
+            resolve(
+              window.setTimeout(
+                () => this.handleDrawingPointerUpTimeout(),
+                2000,
+              ),
+            );
+          });
+
+          timeoutPromise.then((res) => {
+            console.log("ID:", res);
+            this.setState({
+              drawingPointerUpTimeoutID: res,
+            });
+          });
+        }
         return;
       }
       if (isImageElement(newElement)) {

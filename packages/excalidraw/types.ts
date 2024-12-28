@@ -292,6 +292,9 @@ export interface AppState {
   } & ActiveTool;
   penMode: boolean;
   penDetected: boolean;
+  isDrawingPointerUp: boolean | null;
+  activeDrawingElements: NonDeletedExcalidrawElement[];
+  drawingPointerUpTimeoutID: number | null | unknown;
   exportBackground: boolean;
   exportEmbedScene: boolean;
   exportWithDarkMode: boolean;

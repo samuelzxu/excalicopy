@@ -77,7 +77,7 @@ export const setEraserCursor = (
 
 export const setCursorForShape = (
   interactiveCanvas: HTMLCanvasElement | null,
-  appState: Pick<AppState, "activeTool" | "theme">,
+  appState: Pick<AppState, "activeTool" | "theme" | "mathMode">,
 ) => {
   if (!interactiveCanvas) {
     return;
@@ -98,7 +98,11 @@ export const setCursorForShape = (
         : laserPointerCursorDataURL_darkMode;
     interactiveCanvas.style.cursor = `url(${url}), auto`;
   } else if (!["image", "custom"].includes(appState.activeTool.type)) {
-    interactiveCanvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
+    if (appState.mathMode && appState.activeTool.type === "freedraw") {
+      interactiveCanvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
+    } else {
+      interactiveCanvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
+    }
   } else if (appState.activeTool.type !== "image") {
     interactiveCanvas.style.cursor = CURSOR_TYPE.AUTO;
   }

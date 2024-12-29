@@ -1431,7 +1431,7 @@ export const MathIcon = createIcon(
   <text
     x="50%"
     y="50%"
-    dominant-baseline="middle"
+    dominantBaseline="middle"
     textAnchor="middle"
     fontFamily="Arial"
     fontSize="25"

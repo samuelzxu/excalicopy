@@ -1432,10 +1432,10 @@ export const MathIcon = createIcon(
     x="50%"
     y="50%"
     dominant-baseline="middle"
-    text-anchor="middle"
-    font-family="Arial"
-    font-size="25"
-    stroke-width="0.2"
+    textAnchor="middle"
+    fontFamily="Arial"
+    fontSize="25"
+    strokeWidth="0.2"
     fill="black"
   >
     M

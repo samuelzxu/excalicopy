@@ -22,6 +22,7 @@ import type {
   ExcalidrawIframeLikeElement,
   OrderedExcalidrawElement,
   ExcalidrawNonSelectionElement,
+  ExcalidrawRectangleElement,
 } from "./element/types";
 import type { Action } from "./actions/types";
 import type { LinearElementEditor } from "./element/linearElementEditor";
@@ -294,6 +295,8 @@ export interface AppState {
   penDetected: boolean;
   isDrawingPointerUp: boolean | null;
   activeDrawingElements: NonDeletedExcalidrawElement[];
+  elementsInActiveRectangle: NonDeletedExcalidrawElement[];
+  activeEntryRectangle: ExcalidrawRectangleElement | null;
   drawingPointerUpTimeoutID: number | null | unknown;
   exportBackground: boolean;
   exportEmbedScene: boolean;

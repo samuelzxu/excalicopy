@@ -190,6 +190,7 @@ import type {
   ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
   NonDeletedSceneElementsMap,
+  ExcalidrawRectangleElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -463,6 +464,7 @@ import {
 import { searchItemInFocusAtom } from "./SearchMenu";
 import type { LocalPoint, Radians } from "../../math";
 import { pointFrom, pointDistance, vector } from "../../math";
+import { toolIsArrow } from "../scene/comparisons";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -7122,11 +7124,66 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private setNewEntryRectangleIfContained = (
+    sceneX: number,
+    sceneY: number,
+  ) => {
+    const contEntryRects = this.scene
+      .getNonDeletedElements()
+      .filter((element) => {
+        return (
+          element.type === "rectangle" &&
+          element.link === "entrymarker" &&
+          sceneX < element.x + element.width &&
+          sceneX > element.x &&
+          sceneY > element.y &&
+          sceneY < element.y + element.height
+        );
+      });
+    if (contEntryRects.length > 1) {
+      throw new Error("Can't have nested entry rectangles!");
+    } else if (contEntryRects.length === 1) {
+      const entryRect = contEntryRects[0];
+      if (entryRect.type === "rectangle") {
+        this.setState({ activeEntryRectangle: entryRect });
+      } else {
+        throw new Error(
+          "This shouldn't happen, the rectangle should be filtered for type === 'rectangle'",
+        );
+      }
+      console.log("Set new active entry rectangle");
+    }
+  };
+
   private handleFreeDrawElementOnPointerDown = (
     event: React.PointerEvent<HTMLElement>,
     elementType: ExcalidrawFreeDrawElement["type"],
     pointerDownState: PointerDownState,
   ) => {
+    // Get the entry rectangle that contains this point, if it exists
+    const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+      { clientX: event.clientX, clientY: event.clientY },
+      this.state,
+    );
+
+    if (!this.state.activeEntryRectangle) {
+      this.setNewEntryRectangleIfContained(sceneX, sceneY);
+    } else {
+      const activeRect = this.state.activeEntryRectangle;
+      if (
+        sceneX < activeRect.x + activeRect.width &&
+        sceneX > activeRect.x &&
+        sceneY > activeRect.y &&
+        sceneY < activeRect.y + activeRect.height
+      ) {
+        console.log("Down inside Rectangle");
+      } else {
+        console.log("Down outside of rectangle");
+        this.setState({ activeEntryRectangle: null });
+        this.setNewEntryRectangleIfContained(sceneX, sceneY);
+      }
+    }
+
     // Begin a mark capture. This does not have to update state yet.
     const [gridX, gridY] = getGridPoint(
       pointerDownState.origin.x,
@@ -8473,6 +8530,12 @@ class App extends React.Component<AppProps, AppState> {
         this.actionManager.executeAction(actionFinalize);
 
         if (this.state.mathMode && !this.state.drawingPointerUpTimeoutID) {
+          if (this.state.activeEntryRectangle !== null) {
+            const curActiveRectElems = this.state.elementsInActiveRectangle;
+            this.setState({
+              elementsInActiveRectangle: [...curActiveRectElems],
+            });
+          }
           if (
             this.state.activeDrawingElements &&
             this.state.activeDrawingElements.length >= 0

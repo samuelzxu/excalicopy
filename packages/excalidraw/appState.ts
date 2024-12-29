@@ -58,7 +58,7 @@ export const getDefaultAppState = (): Omit<
     },
     penMode: false,
     penDetected: false,
-    mathMode: false,
+    mathMode: true,
     errorMessage: null,
     exportBackground: true,
     exportScale: defaultExportScale,

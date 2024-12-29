@@ -1605,7 +1605,8 @@ class App extends React.Component<AppProps, AppState> {
                           trails={[this.laserTrails, this.eraserTrail]}
                         />
                         {selectedElements.length === 1 &&
-                          this.state.showHyperlinkPopup && (
+                          this.state.showHyperlinkPopup &&
+                          firstSelectedElement.link !== "entrymarker" && (
                             <Hyperlink
                               key={firstSelectedElement.id}
                               element={firstSelectedElement}

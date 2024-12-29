@@ -7124,6 +7124,19 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private isContained(
+    sceneX: number,
+    sceneY: number,
+    element: NonDeletedExcalidrawElement,
+  ) {
+    return (
+      sceneX < element.x + element.width &&
+      sceneX > element.x &&
+      sceneY > element.y &&
+      sceneY < element.y + element.height
+    );
+  }
+
   private setNewEntryRectangleIfContained = (
     sceneX: number,
     sceneY: number,
@@ -7134,10 +7147,7 @@ class App extends React.Component<AppProps, AppState> {
         return (
           element.type === "rectangle" &&
           element.link === "entrymarker" &&
-          sceneX < element.x + element.width &&
-          sceneX > element.x &&
-          sceneY > element.y &&
-          sceneY < element.y + element.height
+          this.isContained(sceneX, sceneY, element)
         );
       });
     if (contEntryRects.length > 1) {
@@ -7170,12 +7180,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setNewEntryRectangleIfContained(sceneX, sceneY);
     } else {
       const activeRect = this.state.activeEntryRectangle;
-      if (
-        sceneX < activeRect.x + activeRect.width &&
-        sceneX > activeRect.x &&
-        sceneY > activeRect.y &&
-        sceneY < activeRect.y + activeRect.height
-      ) {
+      if (this.isContained(sceneX, sceneY, activeRect)) {
         console.log("Down inside Rectangle");
       } else {
         console.log("Down outside of rectangle");

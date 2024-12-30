@@ -4542,14 +4542,12 @@ class App extends React.Component<AppProps, AppState> {
       const rectElems = this.scene.getNonDeletedElements().filter((element) => {
         return this.isContained(element.x, element.y, activeRect);
       });
-      const rectBlobPromise = getCanvasBlob(rectElems, this.state, this.files, {
+      const rectBlob = await getCanvasBlob(rectElems, this.state, this.files, {
         exportBackground: true,
         viewBackgroundColor: this.state.viewBackgroundColor,
       });
-      rectBlobPromise.then((blob) => {
-        const url = URL.createObjectURL(blob);
-        console.log("Active rect elements:", url);
-      });
+      const url = URL.createObjectURL(rectBlob);
+      console.log("Active rect elements:", url);
     }
     return blobPromise;
   }

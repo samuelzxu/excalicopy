@@ -4510,13 +4510,15 @@ class App extends React.Component<AppProps, AppState> {
     }
   });
 
-  private async handleDrawingPointerUpTimeout(): Promise<Blob> {
+  private async handleDrawingPointerUpTimeout(
+    event: PointerEvent,
+  ): Promise<Blob> {
     if (typeof this.state.drawingPointerUpTimeoutID === "number") {
       console.log("clearing timeout");
       const id: number = this.state.drawingPointerUpTimeoutID;
       window.clearTimeout(id);
     }
-    console.log(this.state.activeDrawingElements);
+    console.log("Active drawing elements: ", this.state.activeDrawingElements);
     this.setState({
       drawingPointerUpTimeoutID: null,
       activeDrawingElements: [],
@@ -4532,8 +4534,23 @@ class App extends React.Component<AppProps, AppState> {
     );
     blobPromise.then((blob) => {
       const url = URL.createObjectURL(blob);
-      console.log(url);
+      console.log("Active drawing elements:", url);
     });
+
+    const activeRect = this.state.activeEntryRectangle;
+    if (activeRect !== null) {
+      const rectElems = this.scene.getNonDeletedElements().filter((element) => {
+        return this.isContained(element.x, element.y, activeRect);
+      });
+      const rectBlobPromise = getCanvasBlob(rectElems, this.state, this.files, {
+        exportBackground: true,
+        viewBackgroundColor: this.state.viewBackgroundColor,
+      });
+      rectBlobPromise.then((blob) => {
+        const url = URL.createObjectURL(blob);
+        console.log("Active rect elements:", url);
+      });
+    }
     return blobPromise;
   }
 
@@ -8535,12 +8552,6 @@ class App extends React.Component<AppProps, AppState> {
         this.actionManager.executeAction(actionFinalize);
 
         if (this.state.mathMode && !this.state.drawingPointerUpTimeoutID) {
-          if (this.state.activeEntryRectangle !== null) {
-            const curActiveRectElems = this.state.elementsInActiveRectangle;
-            this.setState({
-              elementsInActiveRectangle: [...curActiveRectElems],
-            });
-          }
           if (
             this.state.activeDrawingElements &&
             this.state.activeDrawingElements.length >= 0
@@ -8557,7 +8568,7 @@ class App extends React.Component<AppProps, AppState> {
           const timeoutPromise = new Promise((resolve) => {
             resolve(
               window.setTimeout(
-                () => this.handleDrawingPointerUpTimeout(),
+                () => this.handleDrawingPointerUpTimeout(childEvent),
                 2000,
               ),
             );

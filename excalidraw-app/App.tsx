@@ -795,10 +795,8 @@ const ExcalidrawWrapper = () => {
       <Excalidraw
         excalidrawAPI={excalidrawRefCallback}
         onChange={onChange}
-        // initialData={initialStatePromiseRef.current.promise}
-        initialData={{
-          libraryItems,
-        }}
+        initialData={initialStatePromiseRef.current.promise}
+        initialLibraryData={{ libraryItems }}
         isCollaborating={isCollaborating}
         onPointerUpdate={collabAPI?.onPointerUpdate}
         UIOptions={{

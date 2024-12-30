@@ -24,6 +24,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {
     onChange,
     initialData,
+    initialLibraryItems,
     excalidrawAPI,
     isCollaborating = false,
     onPointerUpdate,
@@ -112,6 +113,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
         <App
           onChange={onChange}
           initialData={initialData}
+          initialLibraryItems={initialLibraryItems}
           excalidrawAPI={excalidrawAPI}
           isCollaborating={isCollaborating}
           onPointerUpdate={onPointerUpdate}

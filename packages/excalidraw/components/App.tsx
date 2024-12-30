@@ -2274,16 +2274,17 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ isLoading: true });
     }
     let initialData = null;
+    const libraryItems = this.props.initialLibraryItems;
     try {
       if (typeof this.props.initialData === "function") {
         initialData = (await this.props.initialData()) || null;
       } else {
         initialData = (await this.props.initialData) || null;
       }
-      if (initialData?.libraryItems) {
+      if (libraryItems) {
         this.library
           .updateLibrary({
-            libraryItems: initialData.libraryItems,
+            libraryItems,
             merge: true,
           })
           .catch((error) => {

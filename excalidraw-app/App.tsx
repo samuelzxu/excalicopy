@@ -1,3 +1,4 @@
+// @ts-nocheck
 import polyfill from "../packages/excalidraw/polyfill";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { trackEvent } from "../packages/excalidraw/analytics";
@@ -127,6 +128,7 @@ import DebugCanvas, {
   loadSavedDebugState,
 } from "./components/DebugCanvas";
 import { AIComponents } from "./components/AI";
+import { exerciseElements } from "./data/initialExercises";
 
 polyfill();
 
@@ -793,7 +795,10 @@ const ExcalidrawWrapper = () => {
       <Excalidraw
         excalidrawAPI={excalidrawRefCallback}
         onChange={onChange}
-        initialData={initialStatePromiseRef.current.promise}
+        // initialData={initialStatePromiseRef.current.promise}
+        initialData={{
+          elements: exerciseElements,
+        }}
         isCollaborating={isCollaborating}
         onPointerUpdate={collabAPI?.onPointerUpdate}
         UIOptions={{

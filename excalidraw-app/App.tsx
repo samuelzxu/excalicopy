@@ -128,7 +128,7 @@ import DebugCanvas, {
   loadSavedDebugState,
 } from "./components/DebugCanvas";
 import { AIComponents } from "./components/AI";
-import { exerciseElements } from "./data/initialExercises";
+import { libraryItems } from "./data/initialExercises";
 
 polyfill();
 
@@ -797,7 +797,7 @@ const ExcalidrawWrapper = () => {
         onChange={onChange}
         // initialData={initialStatePromiseRef.current.promise}
         initialData={{
-          elements: exerciseElements,
+          libraryItems,
         }}
         isCollaborating={isCollaborating}
         onPointerUpdate={collabAPI?.onPointerUpdate}

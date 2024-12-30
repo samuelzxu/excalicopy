@@ -2418,7 +2418,7 @@ class App extends React.Component<AppProps, AppState> {
     this.unmounted = false;
     this.excalidrawContainerValue.container =
       this.excalidrawContainerRef.current;
-
+    console.log("OAI KEY:", import.meta.env.VITE_OAI_KEY);
     if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
       const setState = this.setState.bind(this);
       Object.defineProperties(window.h, {

@@ -37,6 +37,8 @@ interface ImportMetaEnv {
 
   MODE: string;
 
+  VITE_OAI_KEY: string;
+
   DEV: string;
   PROD: string;
 }

@@ -629,6 +629,7 @@ export type AppProps = Merge<
     detectScroll: boolean;
     handleKeyboardGlobally: boolean;
     isCollaborating: boolean;
+    initialLibraryItems: any;
     children?: React.ReactNode;
     aiEnabled: boolean;
   }

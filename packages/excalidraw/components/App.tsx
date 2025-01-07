@@ -2289,6 +2289,8 @@ class App extends React.Component<AppProps, AppState> {
     }
     let initialData = null;
     const libraryItems = this.props.initialLibraryItems;
+    console.log(this.props.isCollaborating);
+    console.log(libraryItems);
     try {
       if (typeof this.props.initialData === "function") {
         initialData = (await this.props.initialData()) || null;

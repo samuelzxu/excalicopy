@@ -212,6 +212,68 @@ export const ClearCanvas = () => {
 };
 ClearCanvas.displayName = "ClearCanvas";
 
+export const SetKeys = () => {
+  const appState = useUIAppState();
+  const setAppState = useExcalidrawSetAppState();
+
+  const handleOpenAIKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setAppState({ openAIKey: event.target.value });
+  };
+
+  const handleGCloudTokenChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setAppState({ gcloudAccessToken: event.target.value });
+  };
+
+  return (
+    <div style={{ padding: "1rem" }}>
+      <div style={{ marginBottom: "1rem" }}>
+        <label
+          htmlFor="openai-key"
+          style={{ display: "block", marginBottom: "0.5rem", fontSize: "0.9rem" }}
+        >
+          OpenAI API Key
+        </label>
+        <input
+          id="openai-key"
+          type="password"
+          value={appState.openAIKey}
+          onChange={handleOpenAIKeyChange}
+          style={{
+            width: "100%",
+            padding: "0.5rem",
+            border: "1px solid #ccc",
+            borderRadius: "4px",
+            fontSize: "0.8rem",
+          }}
+          placeholder="API Key Here"
+        />
+      </div>
+      <div>
+        <label
+          htmlFor="gcloud-token"
+          style={{ display: "block", marginBottom: "0.5rem", fontSize: "0.9rem" }}
+        >
+          Google Cloud Access Token
+        </label>
+        <input
+          id="gcloud-token"
+          type="password"
+          value={appState.gcloudAccessToken}
+          onChange={handleGCloudTokenChange}
+          style={{
+            width: "100%",
+            padding: "0.5rem",
+            border: "1px solid #ccc",
+            borderRadius: "4px",
+            fontSize: "0.8rem",
+          }}
+          placeholder="Enter Token Here"
+        />
+      </div>
+    </div>
+  );
+};
+
 export const ToggleTheme = (
   props:
     | {

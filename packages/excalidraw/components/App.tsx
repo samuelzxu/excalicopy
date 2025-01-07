@@ -581,7 +581,7 @@ class App extends React.Component<AppProps, AppState> {
     | OpenAI.ChatCompletionDeveloperMessageParam
     | OpenAI.ChatCompletionUserMessageParam
   >;
-  private openai: OpenAI;
+  private openai: OpenAI | null;
   public library: AppClassProperties["library"];
   public libraryItemsFromStorage: LibraryItems | undefined;
   public id: string;
@@ -711,10 +711,12 @@ class App extends React.Component<AppProps, AppState> {
     );
     this.scene = new Scene();
 
-    this.openai = new OpenAI({
-      apiKey: "openai_key_here",
-      dangerouslyAllowBrowser: true,
-    });
+    this.openai = this.state.openAIKey
+      ? new OpenAI({
+          apiKey: this.state.openAIKey,
+          dangerouslyAllowBrowser: true,
+        })
+      : null;
     this.messages = [];
 
     this.canvas = document.createElement("canvas");
@@ -2289,8 +2291,6 @@ class App extends React.Component<AppProps, AppState> {
     }
     let initialData = null;
     const libraryItems = this.props.initialLibraryItems;
-    console.log(this.props.isCollaborating);
-    console.log(libraryItems);
     try {
       if (typeof this.props.initialData === "function") {
         initialData = (await this.props.initialData()) || null;
@@ -4557,7 +4557,7 @@ class App extends React.Component<AppProps, AppState> {
     console.log(
       `Image uploaded successfully to ${objectName} in bucket ${bucketName}`,
     );
-    return "https://storage.googleapis.com/knowable-maths/" + objectName;
+    return `https://storage.googleapis.com/knowable-maths/${objectName}`;
   }
 
   private getCompletionRequest(
@@ -4623,6 +4623,17 @@ class App extends React.Component<AppProps, AppState> {
       return false;
     }
 
+    if (!this.openai) {
+      console.error("No OpenAI instance found");
+      if (this.state.openAIKey !== "") {
+        this.openai = new OpenAI({
+          apiKey: this.state.openAIKey,
+          dangerouslyAllowBrowser: true,
+        });
+      }
+      return false;
+    }
+
     const completion = await this.openai.chat.completions.create({
       model: "gpt-4o",
       messages: this.getCompletionRequest("image", imageURL),
@@ -4670,7 +4681,7 @@ class App extends React.Component<AppProps, AppState> {
       });
       const bucketName = "knowable-maths";
       const objectName = `${Date.now().toString()}-rect.png`;
-      const accessToken = "gcloud_access_token";
+      const accessToken = this.state.gcloudAccessToken;
       console.log("Attempting to upload object with accessToken", accessToken);
 
       const imageURL = await this.uploadImage(

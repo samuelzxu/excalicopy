@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { flushSync } from "react-dom";
+import OpenAI from "openai";
 
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
@@ -574,6 +575,13 @@ class App extends React.Component<AppProps, AppState> {
   public visibleElements: readonly NonDeletedExcalidrawElement[];
   private resizeObserver: ResizeObserver | undefined;
   private nearestScrollableContainer: HTMLElement | Document | undefined;
+  private messages: Array<
+    | OpenAI.ChatCompletionMessage
+    | OpenAI.ChatCompletionSystemMessageParam
+    | OpenAI.ChatCompletionDeveloperMessageParam
+    | OpenAI.ChatCompletionUserMessageParam
+  >;
+  private openai: OpenAI;
   public library: AppClassProperties["library"];
   public libraryItemsFromStorage: LibraryItems | undefined;
   public id: string;
@@ -702,6 +710,12 @@ class App extends React.Component<AppProps, AppState> {
       this,
     );
     this.scene = new Scene();
+
+    this.openai = new OpenAI({
+      apiKey: "openai_key_here",
+      dangerouslyAllowBrowser: true,
+    });
+    this.messages = [];
 
     this.canvas = document.createElement("canvas");
     this.rc = rough.canvas(this.canvas);
@@ -2419,7 +2433,6 @@ class App extends React.Component<AppProps, AppState> {
     this.unmounted = false;
     this.excalidrawContainerValue.container =
       this.excalidrawContainerRef.current;
-    console.log("OAI KEY:", import.meta.env.VITE_OAI_KEY);
     if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
       const setState = this.setState.bind(this);
       Object.defineProperties(window.h, {
@@ -4511,6 +4524,111 @@ class App extends React.Component<AppProps, AppState> {
     }
   });
 
+  private async uploadImage(
+    bucketName: string,
+    objectName: string,
+    accessToken: string,
+    blob: Blob,
+  ): Promise<string> {
+    const url = `https://storage.googleapis.com/upload/storage/v1/b/${bucketName}/o?uploadType=media&name=${encodeURIComponent(
+      objectName,
+    )}`;
+
+    const headers = {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": blob.type, // Set the content type of the blob
+    };
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers,
+      body: blob, // Pass the blob data as the request body
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to upload image: ${response.status} ${response.statusText}\n${errorText}`,
+      );
+    }
+
+    console.log(
+      `Image uploaded successfully to ${objectName} in bucket ${bucketName}`,
+    );
+    return "https://storage.googleapis.com/knowable-maths/" + objectName;
+  }
+
+  private getCompletionRequest(
+    type: "image" | "text" | "audio",
+    content: string,
+  ) {
+    if (this.messages.length === 0) {
+      this.messages = [
+        {
+          role: "system",
+          content: [
+            {
+              type: "text",
+              text: `You are a mathematics professor speaking to a highschool student.
+          You're given the current whiteboard of a solution to azn exercise they're working on.
+          Your job is to push them into the correct direction if they're stuck in the problem.
+          A student only has so much patience, so please keep your responses to a brief length.
+          If you see that the student is stuck on a section, please only give a brief one-sentence hint as to the next step.`,
+            },
+          ],
+        },
+      ];
+    }
+    switch (type) {
+      case "image":
+        this.messages.push({
+          role: "user",
+          content: [
+            {
+              type: "image_url",
+              image_url: {
+                url: content,
+              },
+            },
+            {
+              type: "text",
+              text: "This is the current state of the whiteboard.",
+            },
+          ],
+        });
+        break;
+      case "text":
+        this.messages.push({
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: content,
+            },
+          ],
+        });
+        break;
+      case "audio":
+        console.log("Not implemented");
+        break;
+    }
+    return this.messages;
+  }
+
+  private async getImageCompletion(imageURL: string | null) {
+    if (imageURL === null) {
+      console.error("No image URL provided");
+      return false;
+    }
+
+    const completion = await this.openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: this.getCompletionRequest("image", imageURL),
+    });
+
+    return completion.choices[0].message;
+  }
+
   private async handleDrawingPointerUpTimeout(
     event: PointerEvent,
   ): Promise<Blob> {
@@ -4520,10 +4638,7 @@ class App extends React.Component<AppProps, AppState> {
       window.clearTimeout(id);
     }
     console.log("Active drawing elements: ", this.state.activeDrawingElements);
-    this.setState({
-      drawingPointerUpTimeoutID: null,
-      activeDrawingElements: [],
-    });
+
     const blobPromise = getCanvasBlob(
       this.state.activeDrawingElements,
       this.state,
@@ -4533,9 +4648,13 @@ class App extends React.Component<AppProps, AppState> {
         viewBackgroundColor: this.state.viewBackgroundColor,
       },
     );
-    blobPromise.then((blob) => {
-      const url = URL.createObjectURL(blob);
-      console.log("Active drawing elements:", url);
+    // blobPromise.then((blob) => {
+    //   const url = URL.createObjectURL(blob);
+    //   console.log("Active drawing elements:", url);
+    // });
+    this.setState({
+      drawingPointerUpTimeoutID: null,
+      activeDrawingElements: [],
     });
 
     const activeRect = this.state.activeEntryRectangle;
@@ -4547,8 +4666,30 @@ class App extends React.Component<AppProps, AppState> {
         exportBackground: true,
         viewBackgroundColor: this.state.viewBackgroundColor,
       });
+      const bucketName = "knowable-maths";
+      const objectName = `${Date.now().toString()}-rect.png`;
+      const accessToken = "gcloud_access_token";
+      console.log("Attempting to upload object with accessToken", accessToken);
+
+      const imageURL = await this.uploadImage(
+        bucketName,
+        objectName,
+        accessToken,
+        rectBlob,
+      ).catch((error) => console.error(error));
+
       const url = URL.createObjectURL(rectBlob);
       console.log("Active rect elements:", url);
+
+      if (imageURL) {
+        const completion = this.getImageCompletion(imageURL);
+        completion.then((message) => {
+          console.log("Response: ", message ? message.content : message);
+          if (message) {
+            this.messages.push(message);
+          }
+        });
+      }
     }
     return blobPromise;
   }
@@ -7172,6 +7313,8 @@ class App extends React.Component<AppProps, AppState> {
       const entryRect = contEntryRects[0];
       if (entryRect.type === "rectangle") {
         this.setState({ activeEntryRectangle: entryRect });
+        // Since new entry rectangle is being set, wipe the old messages
+        this.messages = [];
       } else {
         throw new Error(
           "This shouldn't happen, the rectangle should be filtered for type === 'rectangle'",

@@ -216,11 +216,15 @@ export const SetKeys = () => {
   const appState = useUIAppState();
   const setAppState = useExcalidrawSetAppState();
 
-  const handleOpenAIKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleOpenAIKeyChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setAppState({ openAIKey: event.target.value });
   };
 
-  const handleGCloudTokenChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleGCloudTokenChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setAppState({ gcloudAccessToken: event.target.value });
   };
 
@@ -229,7 +233,11 @@ export const SetKeys = () => {
       <div style={{ marginBottom: "1rem" }}>
         <label
           htmlFor="openai-key"
-          style={{ display: "block", marginBottom: "0.5rem", fontSize: "0.9rem" }}
+          style={{
+            display: "block",
+            marginBottom: "0.5rem",
+            fontSize: "0.9rem",
+          }}
         >
           OpenAI API Key
         </label>
@@ -251,7 +259,11 @@ export const SetKeys = () => {
       <div>
         <label
           htmlFor="gcloud-token"
-          style={{ display: "block", marginBottom: "0.5rem", fontSize: "0.9rem" }}
+          style={{
+            display: "block",
+            marginBottom: "0.5rem",
+            fontSize: "0.9rem",
+          }}
         >
           Google Cloud Access Token
         </label>

@@ -4611,7 +4611,7 @@ class App extends React.Component<AppProps, AppState> {
         });
         break;
       case "audio":
-        console.log("Not implemented");
+        console.error("Audio not implemented");
         break;
     }
     return this.messages;

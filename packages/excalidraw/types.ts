@@ -274,6 +274,8 @@ export interface AppState {
   editingFrame: string | null;
   elementsToHighlight: NonDeleted<ExcalidrawElement>[] | null;
   mathMode: boolean;
+  openAIKey: string;
+  gcloudAccessToken: string;
   /**
    * set when a new text is created or when an existing text is being edited
    */

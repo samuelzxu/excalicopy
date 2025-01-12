@@ -373,7 +373,10 @@ export const libraryItems = [
         roundness: null,
         boundElements: [],
         updated: 1735525662737,
-        link: "entrymarker",
+        customData: {
+          entryRect: true,
+        },
+        link: null,
         locked: false,
       },
       {
@@ -401,7 +404,10 @@ export const libraryItems = [
         roundness: null,
         boundElements: [],
         updated: 1735525666789,
-        link: "entrymarker",
+        link: null,
+        customData: {
+          entryRect: true,
+        },
         locked: false,
       },
       {
@@ -429,7 +435,10 @@ export const libraryItems = [
         roundness: null,
         boundElements: [],
         updated: 1735525260829,
-        link: "entrymarker",
+        link: null,
+        customData: {
+          entryRect: true,
+        },
         locked: false,
       },
       {
@@ -457,7 +466,10 @@ export const libraryItems = [
         roundness: null,
         boundElements: [],
         updated: 1735525279851,
-        link: "entrymarker",
+        link: null,
+        customData: {
+          entryRect: true,
+        },
         locked: false,
       },
       {

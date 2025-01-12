@@ -129,7 +129,6 @@ import DebugCanvas, {
 } from "./components/DebugCanvas";
 import { AIComponents } from "./components/AI";
 import { libraryItems } from "./data/initialExercises";
-import { library } from "./build/assets/locales/ar-SA.json-D_jDFH8k";
 
 polyfill();
 

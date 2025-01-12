@@ -1623,8 +1623,7 @@ class App extends React.Component<AppProps, AppState> {
                           trails={[this.laserTrails, this.eraserTrail]}
                         />
                         {selectedElements.length === 1 &&
-                          this.state.showHyperlinkPopup &&
-                          firstSelectedElement.link !== "entrymarker" && (
+                          this.state.showHyperlinkPopup && (
                             <Hyperlink
                               key={firstSelectedElement.id}
                               element={firstSelectedElement}
@@ -7316,7 +7315,8 @@ class App extends React.Component<AppProps, AppState> {
       .filter((element) => {
         return (
           element.type === "rectangle" &&
-          element.link === "entrymarker" &&
+          element.customData &&
+          element.customData.entryRect &&
           this.isContained(sceneX, sceneY, element)
         );
       });

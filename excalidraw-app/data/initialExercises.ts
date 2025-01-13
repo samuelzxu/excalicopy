@@ -375,6 +375,7 @@ export const libraryItems = [
         updated: 1735525662737,
         customData: {
           entryRect: true,
+          problemPrompt: "problem 1 prompt",
         },
         link: null,
         locked: false,
@@ -407,6 +408,7 @@ export const libraryItems = [
         link: null,
         customData: {
           entryRect: true,
+          problemPrompt: "problem 1 prompt",
         },
         locked: false,
       },
@@ -438,6 +440,7 @@ export const libraryItems = [
         link: null,
         customData: {
           entryRect: true,
+          problemPrompt: "problem 1 prompt",
         },
         locked: false,
       },
@@ -469,6 +472,7 @@ export const libraryItems = [
         link: null,
         customData: {
           entryRect: true,
+          problemPrompt: "problem 1 prompt",
         },
         locked: false,
       },

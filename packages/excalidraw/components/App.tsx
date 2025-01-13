@@ -4562,6 +4562,7 @@ class App extends React.Component<AppProps, AppState> {
   private getCompletionRequest(
     type: "image" | "text" | "audio",
     content: string,
+    prompt: string,
   ) {
     if (this.messages.length === 0) {
       this.messages = [
@@ -4574,7 +4575,9 @@ class App extends React.Component<AppProps, AppState> {
           You're given the current whiteboard of a solution to azn exercise they're working on.
           Your job is to push them into the correct direction if they're stuck in the problem.
           A student only has so much patience, so please keep your responses to a brief length.
-          If you see that the student is stuck on a section, please only give a brief one-sentence hint as to the next step.`,
+          If you see that the student is stuck on a section, please only give a brief one-sentence hint as to the next step.
+          
+          ${prompt}`,
             },
           ],
         },
@@ -4616,29 +4619,31 @@ class App extends React.Component<AppProps, AppState> {
     return this.messages;
   }
 
-  private async getImageCompletion(imageURL: string | null) {
+  private async getImageCompletion(imageURL: string | null, prompt: string) {
     if (imageURL === null) {
       console.error("No image URL provided");
       return false;
     }
 
     if (!this.openai) {
-      console.error("No OpenAI instance found");
+      console.log("Creating new openAi instance");
       if (this.state.openAIKey !== "") {
         this.openai = new OpenAI({
           apiKey: this.state.openAIKey,
           dangerouslyAllowBrowser: true,
         });
       }
-      return false;
     }
 
-    const completion = await this.openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: this.getCompletionRequest("image", imageURL),
-    });
+    if (this.openai) {
+      const completion = await this.openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: this.getCompletionRequest("image", imageURL, prompt),
+      });
 
-    return completion.choices[0].message;
+      return completion.choices[0].message;
+    }
+    return null;
   }
 
   private async handleDrawingPointerUpTimeout(
@@ -4694,11 +4699,14 @@ class App extends React.Component<AppProps, AppState> {
       console.log("Active rect elements:", url);
 
       if (imageURL) {
-        const completion = this.getImageCompletion(imageURL);
+        const completion = this.getImageCompletion(
+          imageURL,
+          activeRect.customData?.problemPrompt,
+        );
         completion.then((message) => {
-          console.log("Response: ", message ? message.content : message);
           if (message) {
             this.messages.push(message);
+            console.log("Messages: ", this.messages);
           }
         });
       }

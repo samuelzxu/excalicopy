@@ -620,6 +620,12 @@ class App extends React.Component<AppProps, AppState> {
 
   animationFrameHandler = new AnimationFrameHandler();
 
+  private globalPrompt = `You are a mathematics professor speaking to a highschool student.
+          You're given the current whiteboard of a solution to azn exercise they're working on.
+          Your job is to push them into the correct direction if they're stuck in the problem.
+          A student only has so much patience, so please keep your responses to a brief length.
+          If you see that the student is stuck on a section, please only give a brief one-sentence hint as to the next step.`;
+
   laserTrails = new LaserTrails(this.animationFrameHandler, this);
   eraserTrail = new AnimatedTrail(this.animationFrameHandler, this, {
     streamline: 0.2,
@@ -4571,13 +4577,7 @@ class App extends React.Component<AppProps, AppState> {
           content: [
             {
               type: "text",
-              text: `You are a mathematics professor speaking to a highschool student.
-          You're given the current whiteboard of a solution to azn exercise they're working on.
-          Your job is to push them into the correct direction if they're stuck in the problem.
-          A student only has so much patience, so please keep your responses to a brief length.
-          If you see that the student is stuck on a section, please only give a brief one-sentence hint as to the next step.
-          
-          ${prompt}`,
+              text: `${this.globalPrompt}\n\n${prompt}`,
             },
           ],
         },

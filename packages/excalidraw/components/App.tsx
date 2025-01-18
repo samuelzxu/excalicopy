@@ -624,7 +624,14 @@ class App extends React.Component<AppProps, AppState> {
           You're given the current whiteboard of a solution to azn exercise they're working on.
           Your job is to push them into the correct direction if they're stuck in the problem.
           A student only has so much patience, so please keep your responses to a brief length.
-          If you see that the student is stuck on a section, please only give a brief one-sentence hint as to the next step.`;
+          If you see that the student is stuck on a section, please only give a brief one-sentence hint as to the next step.
+          
+          It is essential for the learning process that they are able to perform calculations on their own. Hence, you must refrain from
+          performing calculations for them. Instead of solving it, here's what you can do:
+          - Prompt them to perform the calculation
+          - Perform ONLY the first step for them
+          - Correct their mistake(s) if there are any
+          `;
 
   laserTrails = new LaserTrails(this.animationFrameHandler, this);
   eraserTrail = new AnimatedTrail(this.animationFrameHandler, this, {

@@ -375,7 +375,22 @@ export const libraryItems = [
         updated: 1735525662737,
         customData: {
           entryRect: true,
-          problemPrompt: "problem 1 prompt",
+          problemPrompt: `This problem involves factoring the trinomial $x^2+3x+2$. There are several ways to approach the problem,
+            and I'll outline these below along with several places the student could get stuck.
+            
+            1. Factoring by trial and error : one method is to try to reverse-engineer polynomial by attempting to multiply several binomials.
+            In this case, there is a decent chance of success since the factors are $x+1$ and $x+2$. However, this method would run into problems
+            when faced with more complicated factors. If the student approaches the problem this way, encourage them to continue but also remind
+            them that this method would be ineffective in more complex scenarios.
+            
+            2. The best method is to approach this with the "X Method" or the "Cross Cross Method". In this method the student can become especially
+            confused about how to come up with more candidates to try out, how to modify the diagram to introduce more candidates, or which terms the
+            sums and products correspond to in the original trinomial.
+            
+            - In the first two cases, you can prompt the student to erase the factors the didn't work and try a new factor
+
+            - In the last case, you can inform the student exactly which terms you are supposed to match.
+            `,
         },
         link: null,
         locked: false,
@@ -408,7 +423,7 @@ export const libraryItems = [
         link: null,
         customData: {
           entryRect: true,
-          problemPrompt: "problem 1 prompt",
+          problemPrompt: "problem b prompt",
         },
         locked: false,
       },
@@ -440,7 +455,7 @@ export const libraryItems = [
         link: null,
         customData: {
           entryRect: true,
-          problemPrompt: "problem 1 prompt",
+          problemPrompt: "problem c prompt",
         },
         locked: false,
       },
@@ -472,7 +487,7 @@ export const libraryItems = [
         link: null,
         customData: {
           entryRect: true,
-          problemPrompt: "problem 1 prompt",
+          problemPrompt: "problem d prompt",
         },
         locked: false,
       },

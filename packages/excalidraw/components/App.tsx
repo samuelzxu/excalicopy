@@ -4653,6 +4653,15 @@ class App extends React.Component<AppProps, AppState> {
     return null;
   }
 
+  private async blobToBase64(blob: Blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (err) => reject(err);
+      reader.readAsDataURL(blob);
+    });
+  }
+
   private async handleDrawingPointerUpTimeout(
     event: PointerEvent,
   ): Promise<Blob> {
@@ -4690,20 +4699,24 @@ class App extends React.Component<AppProps, AppState> {
         exportBackground: true,
         viewBackgroundColor: this.state.viewBackgroundColor,
       });
-      const bucketName = "knowable-maths";
-      const objectName = `${Date.now().toString()}-rect.png`;
-      const accessToken = this.state.gcloudAccessToken;
-      console.log("Attempting to upload object with accessToken", accessToken);
+      // const bucketName = "knowable-maths";
+      // const objectName = `${Date.now().toString()}-rect.png`;
+      // const accessToken = this.state.gcloudAccessToken;
+      // console.log("Attempting to upload object with accessToken", accessToken);
 
-      const imageURL = await this.uploadImage(
-        bucketName,
-        objectName,
-        accessToken,
-        rectBlob,
-      ).catch((error) => console.error(error));
+      // const imageURL = await this.uploadImage(
+      //   bucketName,
+      //   objectName,
+      //   accessToken,
+      //   rectBlob,
+      // ).catch((error) => console.error(error));
 
-      const url = URL.createObjectURL(rectBlob);
-      console.log("Active rect elements:", url);
+      const imageBase64 = await this.blobToBase64(rectBlob);
+      const imageURL = `${imageBase64}`;
+      console.log(imageURL);
+
+      // const url = URL.createObjectURL(rectBlob);
+      // console.log("Active rect elements:", url);
 
       if (imageURL) {
         const completion = this.getImageCompletion(

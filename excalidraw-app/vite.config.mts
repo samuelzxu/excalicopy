@@ -124,8 +124,8 @@ export default defineConfig({
         ],
       },
       manifest: {
-        short_name: "Excalidraw",
-        name: "Excalidraw",
+        short_name: "Knowable",
+        name: "Knowable",
         description:
           "Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them.",
         icons: [

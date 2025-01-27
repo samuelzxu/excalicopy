@@ -4543,40 +4543,6 @@ class App extends React.Component<AppProps, AppState> {
     }
   });
 
-  private async uploadImage(
-    bucketName: string,
-    objectName: string,
-    accessToken: string,
-    blob: Blob,
-  ): Promise<string> {
-    const url = `https://storage.googleapis.com/upload/storage/v1/b/${bucketName}/o?uploadType=media&name=${encodeURIComponent(
-      objectName,
-    )}`;
-
-    const headers = {
-      Authorization: `Bearer ${accessToken}`,
-      "Content-Type": blob.type, // Set the content type of the blob
-    };
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers,
-      body: blob, // Pass the blob data as the request body
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(
-        `Failed to upload image: ${response.status} ${response.statusText}\n${errorText}`,
-      );
-    }
-
-    console.log(
-      `Image uploaded successfully to ${objectName} in bucket ${bucketName}`,
-    );
-    return `https://storage.googleapis.com/knowable-maths/${objectName}`;
-  }
-
   private getCompletionRequest(
     type: "image" | "text" | "audio",
     content: string,
@@ -4704,24 +4670,8 @@ class App extends React.Component<AppProps, AppState> {
         exportBackground: true,
         viewBackgroundColor: this.state.viewBackgroundColor,
       });
-      // const bucketName = "knowable-maths";
-      // const objectName = `${Date.now().toString()}-rect.png`;
-      // const accessToken = this.state.gcloudAccessToken;
-      // console.log("Attempting to upload object with accessToken", accessToken);
-
-      // const imageURL = await this.uploadImage(
-      //   bucketName,
-      //   objectName,
-      //   accessToken,
-      //   rectBlob,
-      // ).catch((error) => console.error(error));
-
       const imageBase64 = await this.blobToBase64(rectBlob);
       const imageURL = `${imageBase64}`;
-      console.log(imageURL);
-
-      // const url = URL.createObjectURL(rectBlob);
-      // console.log("Active rect elements:", url);
 
       if (imageURL) {
         const completion = this.getImageCompletion(

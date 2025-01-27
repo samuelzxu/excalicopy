@@ -9006,6 +9006,46 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
+      if (resizingElement) {
+        this.store.shouldCaptureIncrement();
+      }
+      if (resizingElement && isInvisiblySmallElement(resizingElement)) {
+        // update the store snapshot, so that invisible elements are not captured by the store
+        this.updateScene({
+          elements: this.scene
+            .getElementsIncludingDeleted()
+            .filter((el) => el.id !== resizingElement.id),
+          storeAction: StoreAction.UPDATE,
+        });
+      }
+      // handle frame membership for resizing frames and/or selected elements
+      if (pointerDownState.resize.isResizing) {
+        let nextElements = updateFrameMembershipOfSelectedElements(
+          this.scene.getElementsIncludingDeleted(),
+          this.state,
+          this,
+        );
+        const selectedFrames = this.scene
+          .getSelectedElements(this.state)
+          .filter((element): element is ExcalidrawFrameLikeElement =>
+            isFrameLikeElement(element),
+          );
+        for (const frame of selectedFrames) {
+          nextElements = replaceAllElementsInFrame(
+            nextElements,
+            getElementsInResizingFrame(
+              this.scene.getElementsIncludingDeleted(),
+              frame,
+              this.state,
+              elementsMap,
+            ),
+            frame,
+            this,
+          );
+        }
+        this.scene.replaceAllElements(nextElements);
+      }
+
       // Code below handles selection when element(s) weren't
       // drag or added to selection on pointer down phase.
       const hitElement = pointerDownState.hit.element;

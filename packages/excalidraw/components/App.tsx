@@ -10861,12 +10861,21 @@ class App extends React.Component<AppProps, AppState> {
 
   private stopAudioTranscription() {
     if (this.mediaRecorder) {
-      // Remove the event handler before stopping to prevent the final transcription
-      this.mediaRecorder.ondataavailable = null;
-      this.mediaRecorder.stop();
-      this.mediaRecorder.stream.getTracks().forEach((track) => track.stop());
-      this.mediaRecorder = null;
-      this.audioChunks = [];
+      const finalizeRecording = () => {
+        this.mediaRecorder!.ondataavailable = null;
+        this.mediaRecorder!.stop();
+        this.mediaRecorder!.stream.getTracks().forEach((track) => track.stop());
+        this.mediaRecorder = null;
+        this.audioChunks = [];
+      };
+
+      // If we're recording, wait for the current chunk
+      if (this.mediaRecorder.state === "recording") {
+        this.mediaRecorder.onstop = finalizeRecording;
+        this.mediaRecorder.stop();
+      } else {
+        finalizeRecording();
+      }
     }
   }
 

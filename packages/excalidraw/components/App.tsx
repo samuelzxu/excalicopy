@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useContext } from "react";
 import { flushSync } from "react-dom";
 import OpenAI from "openai";
@@ -4563,6 +4564,14 @@ class App extends React.Component<AppProps, AppState> {
     }
     switch (type) {
       case "image":
+        // const previousUserMessage = this.messages.slice().reverse().find((message) => message.role === "user");
+        // let previousContent = null;
+        // if (previousUserMessage) {
+        //   let previousUserMessageContent = previousUserMessage.content[1];
+        //   if (!(typeof previousUserMessageContent === "string") && previousUserMessageContent.type === "text") {
+        //     previousContent = previousUserMessageContent.text;
+        //   }
+        // }
         this.messages.push({
           role: "user",
           content: [
@@ -4574,7 +4583,7 @@ class App extends React.Component<AppProps, AppState> {
             },
             {
               type: "text",
-              text: "This is the current state of the whiteboard.",
+              text: `The above is a snapshot of the whiteboard. This is what your student has said: ${this.audioTranscriptBuffer}`,
             },
           ],
         });
@@ -4641,7 +4650,7 @@ class App extends React.Component<AppProps, AppState> {
       const id: number = this.state.drawingPointerUpTimeoutID;
       window.clearTimeout(id);
     }
-    console.log("Active drawing elements: ", this.state.activeDrawingElements);
+    console.log(`Got ${this.state.activeDrawingElements.length} active drawing elements`);
 
     const blobPromise = getCanvasBlob(
       this.state.activeDrawingElements,
@@ -4652,10 +4661,7 @@ class App extends React.Component<AppProps, AppState> {
         viewBackgroundColor: this.state.viewBackgroundColor,
       },
     );
-    // blobPromise.then((blob) => {
-    //   const url = URL.createObjectURL(blob);
-    //   console.log("Active drawing elements:", url);
-    // });
+
     this.setState({
       drawingPointerUpTimeoutID: null,
       activeDrawingElements: [],
@@ -4673,6 +4679,7 @@ class App extends React.Component<AppProps, AppState> {
       const imageBase64 = await this.blobToBase64(rectBlob);
       const imageURL = `${imageBase64}`;
 
+      console.log("Sending snapshot to OpenAI...");
       if (imageURL) {
         const completion = this.getImageCompletion(
           imageURL,

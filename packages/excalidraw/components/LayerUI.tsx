@@ -61,6 +61,7 @@ import { LaserPointerButton } from "./LaserPointerButton";
 import { TTDDialog } from "./TTDDialog/TTDDialog";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
+import { AudioInputButton } from "./AudioInputButton";
 
 import "./LayerUI.scss";
 import "./Toolbar.scss";
@@ -304,7 +305,13 @@ const LayerUI = ({
                           />
                         </Stack.Row>
                       </Island>
+                      
                       <SubtypeToggles />
+                      <AudioInputButton
+                        checked={appState.isAudioInputActive}
+                        onChange={() => app.toggleAudioInput()}
+                        title={t("toolBar.audioInput")}
+                      />
                       {isCollaborating && (
                         <Island
                           style={{

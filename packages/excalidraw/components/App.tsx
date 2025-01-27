@@ -688,6 +688,10 @@ class App extends React.Component<AppProps, AppState> {
   >();
   onRemoveEventListenersEmitter = new Emitter<[]>();
 
+  private audioTranscriptBuffer: string = "";
+  private mediaRecorder: MediaRecorder | null = null;
+  private audioChunks: Blob[] = [];
+
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
@@ -712,6 +716,7 @@ class App extends React.Component<AppProps, AppState> {
       name,
       width: window.innerWidth,
       height: window.innerHeight,
+      isAudioInputActive: false,
     };
 
     this.id = nanoid();
@@ -2271,7 +2276,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState((state) => ({
         ...getDefaultAppState(),
         isLoading: opts?.resetLoadingState ? false : state.isLoading,
-        theme: this.state.theme,
+        theme: state.theme,
       }));
       this.resetStore();
       this.resetHistory();
@@ -9051,51 +9056,6 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      if (resizingElement) {
-        this.store.shouldCaptureIncrement();
-      }
-
-      if (resizingElement && isInvisiblySmallElement(resizingElement)) {
-        // update the store snapshot, so that invisible elements are not captured by the store
-        this.updateScene({
-          elements: this.scene
-            .getElementsIncludingDeleted()
-            .filter((el) => el.id !== resizingElement.id),
-          storeAction: StoreAction.UPDATE,
-        });
-      }
-
-      // handle frame membership for resizing frames and/or selected elements
-      if (pointerDownState.resize.isResizing) {
-        let nextElements = updateFrameMembershipOfSelectedElements(
-          this.scene.getElementsIncludingDeleted(),
-          this.state,
-          this,
-        );
-
-        const selectedFrames = this.scene
-          .getSelectedElements(this.state)
-          .filter((element): element is ExcalidrawFrameLikeElement =>
-            isFrameLikeElement(element),
-          );
-
-        for (const frame of selectedFrames) {
-          nextElements = replaceAllElementsInFrame(
-            nextElements,
-            getElementsInResizingFrame(
-              this.scene.getElementsIncludingDeleted(),
-              frame,
-              this.state,
-              elementsMap,
-            ),
-            frame,
-            this,
-          );
-        }
-
-        this.scene.replaceAllElements(nextElements);
-      }
-
       // Code below handles selection when element(s) weren't
       // drag or added to selection on pointer down phase.
       const hitElement = pointerDownState.hit.element;
@@ -10811,6 +10771,130 @@ class App extends React.Component<AppProps, AppState> {
     await setLanguage(currentLang);
     this.setAppState({});
   }
+
+  private async restartClearAudioTranscription() {
+    this.stopAudioTranscription();
+    this.clearAudioTranscript();
+    this.startAudioTranscription();
+  }
+
+  private async startAudioTranscription() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      this.mediaRecorder = new MediaRecorder(stream);
+      
+      this.mediaRecorder.ondataavailable = async (event) => {
+        if (event.data.size > 0) {
+          this.audioChunks.push(event.data);
+          
+          // Convert audio chunks to base64 using browser APIs
+          const blob = new Blob(this.audioChunks, { type: 'audio/webm' });
+          const reader = new FileReader();
+          
+          reader.onloadend = async () => {
+            // reader.result contains the base64 string
+            const base64Audio = (reader.result as string).split(',')[1];
+            
+            // Call OpenAI Whisper API
+            const transcription = await this.transcribeAudio(base64Audio);
+            
+            this.audioTranscriptBuffer = transcription;
+            console.log("Transcription:", transcription);
+            // Clear chunks for next batch
+            // this.audioChunks = [];
+
+          };
+          
+          reader.readAsDataURL(blob);
+        }
+      };
+
+      this.mediaRecorder.start(3000); // Capture in 3-second intervals
+    } catch (error) {
+      console.error("Error accessing microphone:", error);
+      this.setAppState({ isAudioInputActive: false });
+    }
+  }
+
+  private async transcribeAudio(base64Audio: string): Promise<string> {
+    try {
+      if (!this.state.openAIKey) {
+        throw new Error("OpenAI API key not set");
+      }
+      
+      this.initializeOpenAI();
+      
+      if (!this.openai) {
+        throw new Error("OpenAI client not initialized");
+      }
+
+      // Convert base64 to blob
+      const binaryData = atob(base64Audio);
+      const bytes = new Uint8Array(binaryData.length);
+      for (let i = 0; i < binaryData.length; i++) {
+        bytes[i] = binaryData.charCodeAt(i);
+      }
+      const audioBlob = new Blob([bytes], { type: 'audio/webm' });
+      const audioFile = new File([audioBlob], 'audio.webm', { type: 'audio/webm' });
+
+      const response = await this.openai.audio.transcriptions.create({
+        file: audioFile,
+        model: "whisper-1",
+        language: "en",
+      });
+
+      return response.text;
+    } catch (error) {
+      console.error("Transcription error:", error);
+      return "";
+    }
+  }
+
+  private initializeOpenAI() {
+    if (!this.openai && this.state.openAIKey) {
+      this.openai = new OpenAI({
+        apiKey: this.state.openAIKey,
+        dangerouslyAllowBrowser: true,
+      });
+    }
+  }
+
+  private stopAudioTranscription() {
+    if (this.mediaRecorder) {
+      // Remove the event handler before stopping to prevent the final transcription
+      this.mediaRecorder.ondataavailable = null;
+      this.mediaRecorder.stop();
+      this.mediaRecorder.stream.getTracks().forEach((track) => track.stop());
+      this.mediaRecorder = null;
+      this.audioChunks = [];
+    }
+  }
+
+  public clearAudioTranscript() {
+    this.audioTranscriptBuffer = "";
+  }
+
+  public toggleAudioInput = () => {
+    // If no API key is set, prompt for it
+    if (!this.state.openAIKey) {
+      const apiKey = prompt("Please enter your OpenAI API key:");
+      if (!apiKey) {
+        return; // Don't start recording if no key provided
+      }
+      this.setAppState({ openAIKey: apiKey });
+    }
+
+    this.setAppState(
+      (prevState) => ({ isAudioInputActive: !prevState.isAudioInputActive }),
+      () => {
+        if (this.state.isAudioInputActive) {
+          this.startAudioTranscription();
+        } else {
+          this.stopAudioTranscription();
+        }
+      },
+    );
+  };
 }
 
 // -----------------------------------------------------------------------------

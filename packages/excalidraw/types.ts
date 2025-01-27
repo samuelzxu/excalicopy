@@ -304,6 +304,7 @@ export interface AppState {
   exportEmbedScene: boolean;
   exportWithDarkMode: boolean;
   exportScale: number;
+  isAudioInputActive: boolean;
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;
   currentItemFillStyle: ExcalidrawElement["fillStyle"];
@@ -421,12 +422,14 @@ type SearchMatch = {
 
 export type UIAppState = Omit<
   AppState,
-  | "suggestedBindings"
-  | "startBoundElement"
   | "cursorButton"
   | "scrollX"
   | "scrollY"
->;
+  | "suggestedBindings"
+  | "startBoundElement"
+> & {
+  isAudioInputActive: boolean;
+};
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
 
@@ -637,7 +640,7 @@ export type AppProps = Merge<
 
 /** A subset of App class properties that we need to use elsewhere
  * in the app, eg Manager. Factored out into a separate type to keep DRY. */
-export type AppClassProperties = {
+export interface AppClassProperties {
   props: AppProps;
   state: AppState;
   interactiveCanvas: HTMLCanvasElement | null;
@@ -681,7 +684,8 @@ export type AppClassProperties = {
   getEditorUIOffsets: App["getEditorUIOffsets"];
   visibleElements: App["visibleElements"];
   excalidrawContainerValue: App["excalidrawContainerValue"];
-};
+  toggleAudioInput: () => void;
+}
 
 export type PointerDownState = Readonly<{
   // The first position at which pointerDown happened

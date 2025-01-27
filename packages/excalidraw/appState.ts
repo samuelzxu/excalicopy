@@ -125,6 +125,7 @@ export const getDefaultAppState = (): Omit<
     userToFollow: null,
     followedBy: new Set(),
     searchMatches: [],
+    isAudioInputActive: false,
   };
 };
 
@@ -256,6 +257,7 @@ const APP_STATE_STORAGE_CONF = (<
   userToFollow: { browser: false, export: false, server: false },
   followedBy: { browser: false, export: false, server: false },
   searchMatches: { browser: false, export: false, server: false },
+  isAudioInputActive: { browser: false, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

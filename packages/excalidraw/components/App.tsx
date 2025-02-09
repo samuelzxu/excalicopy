@@ -593,6 +593,9 @@ class App extends React.Component<AppProps, AppState> {
     id: string;
   };
 
+  private isProcessingAI: boolean = false;
+  private isSpeaking: boolean = false;
+
   public files: BinaryFiles = {};
   public imageCache: AppClassProperties["imageCache"] = new Map();
   private iFrameRefs = new Map<ExcalidrawElement["id"], HTMLIFrameElement>();
@@ -4612,28 +4615,56 @@ class App extends React.Component<AppProps, AppState> {
       return false;
     }
 
-    if (!this.openai) {
-      console.log("Creating new openAi instance");
-      if (this.state.openAIKey !== "") {
-        this.openai = new OpenAI({
-          apiKey: this.state.openAIKey,
-          dangerouslyAllowBrowser: true,
-        });
+    this.isProcessingAI = true;
+    this.setToast({
+      message: "AI is analyzing your drawing...",
+      closable: false,
+      duration: undefined,
+    });
+
+    try {
+      if (!this.openai) {
+        console.log("Creating new openAi instance");
+        if (this.state.openAIKey !== "") {
+          this.openai = new OpenAI({
+            apiKey: this.state.openAIKey,
+            dangerouslyAllowBrowser: true,
+          });
+        }
       }
-    }
 
-    if (this.openai) {
-      const completion = await this.openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: this.getCompletionRequest("image", imageURL, prompt),
+      if (this.openai) {
+        const completion = await this.openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: this.getCompletionRequest("image", imageURL, prompt),
+        });
+
+        this.isProcessingAI = false;
+        this.setToast(null);
+        return completion.choices[0].message;
+      }
+    } catch (error: any) {
+      this.isProcessingAI = false;
+      this.setToast({
+        message: `AI analysis failed: ${error.message}`,
+        closable: true,
       });
-
-      return completion.choices[0].message;
     }
     return null;
   }
 
   private async getTextToSpeech(text: string) {
+    // If already speaking, don't start a new speech
+    if (this.isSpeaking) {
+      console.log("Speech already in progress, skipping new request");
+      // this.setToast({
+      //   message: "Already playing audio response...",
+      //   closable: true,
+      //   duration: 2000,
+      // });
+      return;
+    }
+
     if (!this.openai) {
       console.log("Creating new openAi instance");
       if (this.state.openAIKey !== "") {
@@ -4646,6 +4677,13 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
+    this.isSpeaking = true;
+    this.setToast({
+      message: "Converting text to speech...",
+      closable: false,
+      duration: undefined,
+    });
+
     try {
       const mp3 = await this.openai.audio.speech.create({
         model: "tts-1",
@@ -4656,14 +4694,36 @@ class App extends React.Component<AppProps, AppState> {
       const blob = new Blob([await mp3.arrayBuffer()], { type: "audio/mpeg" });
       const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
-      audio.play();
 
-      // Clean up the URL after the audio finishes playing
+      audio.onplay = () => {
+        this.setToast({
+          message: "Playing audio response...",
+          closable: false,
+          duration: undefined,
+        });
+      };
+
+      // Clean up the URL and update state after the audio finishes playing
       audio.onended = () => {
         URL.revokeObjectURL(url);
+        this.isSpeaking = false;
+        this.setToast(null);
       };
+
+      // Also handle cases where audio fails to play
+      audio.onerror = () => {
+        URL.revokeObjectURL(url);
+        this.isSpeaking = false;
+        this.setToast({
+          message: "Failed to play audio",
+          closable: true,
+        });
+      };
+
+      audio.play();
     } catch (error: any) {
       console.error("Text-to-speech failed:", error);
+      this.isSpeaking = false;
       this.setToast({
         message: `Text-to-speech failed: ${error.message}`,
         closable: true,
@@ -10614,7 +10674,7 @@ class App extends React.Component<AppProps, AppState> {
         )
       ) {
         // prevent zooming the browser (but allow scrolling DOM)
-        if (event[KEYS.CTRL_OR_CMD]) {
+        if (event.metaKey || event.ctrlKey) {
           event.preventDefault();
         }
 

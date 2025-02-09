@@ -4633,6 +4633,44 @@ class App extends React.Component<AppProps, AppState> {
     return null;
   }
 
+  private async getTextToSpeech(text: string) {
+    if (!this.openai) {
+      console.log("Creating new openAi instance");
+      if (this.state.openAIKey !== "") {
+        this.openai = new OpenAI({
+          apiKey: this.state.openAIKey,
+          dangerouslyAllowBrowser: true,
+        });
+      } else {
+        throw new Error("OpenAI API key not set");
+      }
+    }
+
+    try {
+      const mp3 = await this.openai.audio.speech.create({
+        model: "tts-1",
+        voice: "alloy",
+        input: text,
+      });
+
+      const blob = new Blob([await mp3.arrayBuffer()], { type: "audio/mpeg" });
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audio.play();
+
+      // Clean up the URL after the audio finishes playing
+      audio.onended = () => {
+        URL.revokeObjectURL(url);
+      };
+    } catch (error: any) {
+      console.error("Text-to-speech failed:", error);
+      this.setToast({
+        message: `Text-to-speech failed: ${error.message}`,
+        closable: true,
+      });
+    }
+  }
+
   private async blobToBase64(blob: Blob) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -4650,7 +4688,9 @@ class App extends React.Component<AppProps, AppState> {
       const id: number = this.state.drawingPointerUpTimeoutID;
       window.clearTimeout(id);
     }
-    console.log(`Got ${this.state.activeDrawingElements.length} active drawing elements`);
+    console.log(
+      `Got ${this.state.activeDrawingElements.length} active drawing elements`,
+    );
 
     const blobPromise = getCanvasBlob(
       this.state.activeDrawingElements,
@@ -4689,6 +4729,10 @@ class App extends React.Component<AppProps, AppState> {
           if (message) {
             this.messages.push(message);
             console.log("Messages: ", this.messages);
+            // Convert the message to speech
+            if (message.content) {
+              this.getTextToSpeech(message.content);
+            }
           }
         });
       }
@@ -10779,29 +10823,28 @@ class App extends React.Component<AppProps, AppState> {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       this.mediaRecorder = new MediaRecorder(stream);
-      
+
       this.mediaRecorder.ondataavailable = async (event) => {
         if (event.data.size > 0) {
           this.audioChunks.push(event.data);
-          
+
           // Convert audio chunks to base64 using browser APIs
-          const blob = new Blob(this.audioChunks, { type: 'audio/webm' });
+          const blob = new Blob(this.audioChunks, { type: "audio/webm" });
           const reader = new FileReader();
-          
+
           reader.onloadend = async () => {
             // reader.result contains the base64 string
-            const base64Audio = (reader.result as string).split(',')[1];
-            
+            const base64Audio = (reader.result as string).split(",")[1];
+
             // Call OpenAI Whisper API
             const transcription = await this.transcribeAudio(base64Audio);
-            
+
             this.audioTranscriptBuffer = transcription;
             console.log("Transcription:", transcription);
             // Clear chunks for next batch
             // this.audioChunks = [];
-
           };
-          
+
           reader.readAsDataURL(blob);
         }
       };
@@ -10818,9 +10861,9 @@ class App extends React.Component<AppProps, AppState> {
       if (!this.state.openAIKey) {
         throw new Error("OpenAI API key not set");
       }
-      
+
       this.initializeOpenAI();
-      
+
       if (!this.openai) {
         throw new Error("OpenAI client not initialized");
       }
@@ -10831,8 +10874,10 @@ class App extends React.Component<AppProps, AppState> {
       for (let i = 0; i < binaryData.length; i++) {
         bytes[i] = binaryData.charCodeAt(i);
       }
-      const audioBlob = new Blob([bytes], { type: 'audio/webm' });
-      const audioFile = new File([audioBlob], 'audio.webm', { type: 'audio/webm' });
+      const audioBlob = new Blob([bytes], { type: "audio/webm" });
+      const audioFile = new File([audioBlob], "audio.webm", {
+        type: "audio/webm",
+      });
 
       const response = await this.openai.audio.transcriptions.create({
         file: audioFile,

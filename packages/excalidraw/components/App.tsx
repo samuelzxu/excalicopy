@@ -4696,8 +4696,10 @@ class App extends React.Component<AppProps, AppState> {
       const audio = new Audio(url);
 
       audio.onplay = () => {
+        const lastMessage = this.messages[this.messages.length - 1];
+
         this.setToast({
-          message: "Playing audio response...",
+          message: lastMessage.content && typeof lastMessage.content === "string" ? lastMessage.content : "Playing audio response...",
           closable: false,
           duration: undefined,
         });

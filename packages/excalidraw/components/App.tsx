@@ -4638,6 +4638,7 @@ class App extends React.Component<AppProps, AppState> {
           model: "gpt-4o",
           messages: this.getCompletionRequest("image", imageURL, prompt),
         });
+        this.clearAudioTranscript();
 
         this.isProcessingAI = false;
         this.setToast(null);
